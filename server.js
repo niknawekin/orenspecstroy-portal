@@ -853,7 +853,10 @@ async function startServer() {
         console.log('✅ Администратор уже существует');
     }
     
-    const PORT = 3000;
+    const port = process.env.PORT || 3000;  
+    app.listen(port, () => {  
+    console.log(`Server running on port ${port}`);  
+    });  
     app.listen(PORT, () => {
         console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
         console.log(`📝 Вход для клиентов: зарегистрируйтесь или войдите`);
