@@ -838,7 +838,6 @@ app.get('/admin/tickets/:id', isAdmin, async (req, res) => {
 async function startServer() {
     await initDB();
     
-    // Проверяем и создаем админа, если его нет
     const db = getDB();
     const adminExists = await db.get("SELECT * FROM users WHERE role = 'admin' LIMIT 1");
     
@@ -853,14 +852,11 @@ async function startServer() {
         console.log('✅ Администратор уже существует');
     }
     
-    const port = process.env.PORT || 3000;  
-    app.listen(port, () => {  
-    console.log(`Server running on port ${port}`);  
-    });  
-    app.listen(PORT, () => {
-        console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
+    const PORT = process.env.PORT || 3000;  
+    app.listen(PORT, () => {  
+        console.log(`🚀 Сервер запущен на порту ${PORT}`);
         console.log(`📝 Вход для клиентов: зарегистрируйтесь или войдите`);
-        console.log(`👑 Админ-панель: http://localhost:3000/admin`);
+        console.log(`👑 Админ-панель: http://localhost:${PORT}/admin`);
         console.log(`   Логин: admin@test.com | Пароль: admin123`);
     });
 }
