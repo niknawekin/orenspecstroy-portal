@@ -104,7 +104,6 @@ async function initDB() {
         );
     `);
 
-
     // Добавляем временные слоты
     const slotsCount = await db.get('SELECT COUNT(*) as count FROM time_slots');
     if (slotsCount.count === 0) {
@@ -117,7 +116,7 @@ async function initDB() {
         `);
     }
 
-        // Добавьте начальные услуги в прайс-лист
+    // Добавьте начальные услуги в прайс-лист
     const servicesCount = await db.get('SELECT COUNT(*) as count FROM services');
     if (servicesCount.count === 0) {
         await db.run(`INSERT INTO services (name, category, price, unit) VALUES 
@@ -128,8 +127,6 @@ async function initDB() {
             ('Замена пружины', 'Ремонт', 3500, 'шт'),
             ('Плановое ТО', 'Обслуживание', 2500, 'выезд')`);
     }
-
-
 
     // Миграция для существующей БД (добавляем колонки, если их нет)
     const columns = ['equipment_type', 'model', 'urgency', 'preferred_time', 'address', 'phone'];
@@ -142,17 +139,6 @@ async function initDB() {
         }
     }
 
-    // Добавим тестового админа, если нет пользователей
-    const adminExists = await db.get("SELECT * FROM users WHERE email = 'admin@test.com'");
-    if (!adminExists) {
-        const bcrypt = require('bcrypt');
-        const hashedPassword = await bcrypt.hash('admin123', 10);
-        await db.run(
-            "INSERT INTO users (fio, email, password, phone, role) VALUES (?, ?, ?, ?, ?)",
-            ['Администратор', 'admin@test.com', hashedPassword, '+79990000000', 'admin']
-        );
-        console.log('✅ Тестовый админ создан: admin@test.com / admin123');
-    }
     // Добавляем колонку completed_at, если её нет
     try {
         await db.exec(`ALTER TABLE tickets ADD COLUMN completed_at DATETIME`);
