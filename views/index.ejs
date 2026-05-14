@@ -1,0 +1,180 @@
+<%- include('partials/header') %>
+
+<main>
+    <section class="hero">
+        <div class="video-background">
+            <video autoplay muted loop playsinline poster="/images/hero-gate.jpg">
+                <source src="https://player.vimeo.com/external/494252666.sd.mp4?s=bc463162fb76921381a1793574d5c414421b539c&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+            </video>
+            <div class="video-overlay"></div>
+        </div>
+
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1 class="reveal reveal-left">Оренспецстрой</h1>
+                <p class="reveal reveal-right delay-1">Интеллектуальные системы автоматизации и безопасности вашего объекта</p>
+                
+                <div class="hero-btns reveal reveal-left delay-2">
+                    <a href="/tickets/new" class="btn btn-red">Оставить заявку</a>
+                    <a href="/services" class="btn btn-outline-white">Наши услуги</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-line"></div>
+    </section>
+
+    <section id="stats" class="stats-section" style="background: var(--dark-black); padding: 80px 0; position: relative;">
+        <div class="container">
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; text-align: center;">
+                
+                <div class="stat-item reveal">
+                    <div class="stat-number" data-target="10">0</div>
+                    <div class="stat-label">лет на рынке</div>
+                </div>
+
+                <div class="stat-item reveal delay-1">
+                    <div class="stat-number" data-target="5000">0</div>
+                    <div class="stat-label">объектов обслужено</div>
+                </div>
+
+                <div class="stat-item reveal delay-2">
+                    <div class="stat-number" data-target="24">0</div>
+                    <div class="stat-label">часа поддержка</div>
+                </div>
+
+                <div class="stat-item reveal delay-3">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-label">% запчасти в наличии</div>
+                </div>
+
+            </div>
+        </div>
+        <div style="position: absolute; bottom: 0; left: 20%; width: 60%; height: 1px; background: rgba(227, 6, 19, 0.3);"></div>
+    </section>
+
+    <section id="projects-map" class="reveal" style="padding: 80px 0; background: #fff;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px; text-transform: uppercase; font-weight: 900;">
+                Наши объекты в <span style="color: var(--primary-red);">Оренбурге</span>
+            </h2>
+            
+            <div id="map" style="height: 500px; width: 100%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--medium-grey);"></div>
+        </div>
+    </section>
+
+
+    <section class="brands-section reveal" style="padding: 60px 0; background: #fff; overflow: hidden; border-top: 1px solid #eee;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; color: #888;">Надежные партнеры</h2>
+        </div>
+
+        <div class="logo-slider">
+            <div class="logo-track">
+                <div class="logo-item">Alutech</div>
+                <div class="logo-item">DoorHan</div>
+                <div class="logo-item">CAME</div>
+                <div class="logo-item">Nice</div>
+                <div class="logo-item">Hormann</div>
+                <div class="logo-item">Alutech</div>
+                <div class="logo-item">DoorHan</div>
+                <div class="logo-item">CAME</div>
+                <div class="logo-item">Nice</div>
+                <div class="logo-item">Hormann</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-we-work" style="padding: 80px 0; background: var(--light-grey);">
+        <div class="container" style="max-width: 900px;">
+            <h2 style="text-align: center; margin-bottom: 60px; text-transform: uppercase; font-weight: 900;">
+                Процесс <span style="color: var(--primary-red);">работы</span>
+            </h2>
+
+            <div class="work-chat-container" style="display: flex; flex-direction: column; gap: 30px; position: relative;">
+                
+                <div class="chat-line" style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #ddd; z-index: 1;"></div>
+
+                <div class="work-step reveal reveal-left" style="align-self: flex-start; z-index: 2;">
+                    <div class="work-bubble">
+                        <div class="step-num">01</div>
+                        <h3>Заявка</h3>
+                        <p>Оставляете заявку на сайте или по телефону. Наш менеджер свяжется с вами в течение 15 минут.</p>
+                    </div>
+                </div>
+
+                <div class="work-step reveal reveal-right" style="align-self: flex-end; z-index: 2;">
+                    <div class="work-bubble inverse">
+                        <div class="step-num">02</div>
+                        <h3>Диагностика</h3>
+                        <p>Мастер приезжает на объект в Оренбурге, проводит осмотр и выявляет точную причину неисправности.</p>
+                    </div>
+                </div>
+
+                <div class="work-step reveal reveal-left" style="align-self: flex-start; z-index: 2;">
+                    <div class="work-bubble">
+                        <div class="step-num">03</div>
+                        <h3>Ремонт</h3>
+                        <p>Устраняем проблему на месте с использованием оригинальных запчастей или заказываем редкие детали.</p>
+                    </div>
+                </div>
+
+                <div class="work-step reveal reveal-right" style="align-self: flex-end; z-index: 2;">
+                    <div class="work-bubble inverse">
+                        <div class="step-num">04</div>
+                        <h3>Гарантия</h3>
+                        <p>Вы получаете официальный акт выполненных работ и гарантию на установленные узлы 12 месяцев.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <section class="reviews-section" style="padding: 80px 0; background: #fff;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 50px; text-transform: uppercase; font-weight: 900;">
+                Что говорят <span style="color: var(--primary-red);">клиенты</span>
+            </h2>
+
+            <div class="reviews-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+                
+                <div class="review-card reveal reveal-left">
+                    <div class="chat-header">
+                        <div class="avatar">И</div>
+                        <div class="chat-name">Игорь (ТСЖ «Звездный»)</div>
+                    </div>
+                    <div class="chat-body">
+                        <div class="bubble-msg incoming">
+                            Нужно было срочно починить шлагбаум, перестал реагировать на пульты.
+                        </div>
+                        <div class="bubble-msg outgoing">
+                            Мастер приехал через 2 часа, заменил предохранитель и перепрошил пульты. Все работает!
+                        </div>
+                        <div class="chat-status">Прочитано 14:20</div>
+                    </div>
+                </div>
+
+                <div class="review-card reveal reveal-right">
+                    <div class="chat-header">
+                        <div class="avatar" style="background: #444;">А</div>
+                        <div class="chat-name">Алексей (Ростоши)</div>
+                    </div>
+                    <div class="chat-body">
+                        <div class="bubble-msg incoming">
+                            Ставили гаражные ворота Алютех. Понравилось, что не навязывали самое дорогое.
+                        </div>
+                        <div class="bubble-msg outgoing">
+                            Подобрали серию Trend под мой бюджет. Монтажники вежливые, мусор за собой убрали. Рекомендую.
+                        </div>
+                        <div class="chat-status">Прочитано 10:05</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

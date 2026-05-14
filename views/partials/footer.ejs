@@ -1,0 +1,58 @@
+<footer style="background: var(--dark-black); color: white; padding: 60px 0; border-top: 4px solid var(--primary-red);">
+        <!-- Кнопка для вызова чата -->
+    <button id="chat-toggle" class="chat-toggle-btn">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <!-- Окно чата -->
+    <div id="chat-window" class="ai-chat-container">
+        <div class="chat-header">
+            <span><i class="fas fa-paper-plane"></i> Ваш консультант</span>
+            <button id="chat-close" style="background: none; border: none; color: white; cursor: pointer;">&times;</button>
+        </div>
+        <div id="chat-messages" class="chat-body">
+            <div class="message ai-msg">Здравствуйте! Я виртуальный ассистент. Чем могу помочь?🙂</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Напишите ваш вопрос...">
+            <button id="chat-send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;">
+        <div>
+            <h3>Оренспецстрой</h3>
+            <p style="color: var(--medium-grey); font-size: 0.9rem;">Профессиональное обслуживание ворот и автоматики в Оренбурге и области.</p>
+        </div>
+        <div>
+            <h4>Контакты</h4>
+            <p style="color: var(--medium-grey); font-size: 0.9rem;">
+                г. Оренбург, ул. Монтажников 21<br>
+                Тел: +7 (3532) 00-00-00<br>
+                Email: info@orenspecstroy.ru
+            </p>
+        </div>
+        <div>
+            <h4>Навигация</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li><a href="/services" style="color: white; text-decoration: none;">Услуги</a></li>
+                <li><a href="/kb" style="color: white; text-decoration: none;">База знаний</a></li>
+                <li><a href="/login" style="color: white; text-decoration: none;">Личный кабинет</a></li>
+            </ul>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #333; font-size: 0.8rem; color: #555;">
+        &copy; 2026 Холдинг «Оренспецстрой». Все права защищены.
+    </div>
+</footer>
+
+<script>
+    window.onscroll = function() {
+        const header = document.getElementById('main-header');
+        if (window.pageYOffset > 50) {
+            header.classList.add('header-scrolled');
+        } else {
+            header.classList.remove('header-scrolled');
+        }
+    };
+</script>
+<script src="/js/main.js"></script>

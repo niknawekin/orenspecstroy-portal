@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+
+<main style="background: #050505; height: 100vh; display: flex; align-items: center; justify-content: center; color: white;">
+    <div class="login-box reveal" style="width: 100%; max-width: 400px; padding: 40px; background: #0a0a0a; border: 1px solid #222; border-radius: 10px; box-shadow: 0 0 30px rgba(227, 6, 19, 0.1);">
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="color: var(--primary-red); font-size: 2rem; margin-bottom: 10px;"><i class="fas fa-shield-alt"></i></div>
+            <h2 style="text-transform: uppercase; font-weight: 900; letter-spacing: 2px;">Admin Auth</h2>
+            <p style="color: #444; font-size: 0.8rem;">SECURE TERMINAL ACCESS</p>
+        </div>
+
+        <% if (error) { %>
+            <div style="background: rgba(227, 6, 19, 0.1); color: var(--primary-red); padding: 10px; margin-bottom: 20px; border-radius: 5px; font-size: 0.8rem; text-align: center; border: 1px solid var(--primary-red);">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/admin/auth" method="POST">
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="display: block; color: #666; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Master Password</label>
+                <input type="password" name="password" required style="width: 100%; background: #111; border: 1px solid #333; padding: 15px; color: white; border-radius: 4px; outline: none; transition: 0.3s;">
+            </div>
+            <button type="submit" class="btn-sos" style="width: 100%; justify-content: center; border-radius: 4px;">
+                Authorize
+            </button>
+        </form>
+    </div>
+</main>

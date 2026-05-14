@@ -1,0 +1,644 @@
+<%- include('partials/header') %>
+
+<style>
+    /* Hero секция */
+    .ticket-hero {
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        padding: 80px 0 60px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ticket-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 20% 50%, rgba(227, 27, 35, 0.1) 0%, transparent 50%);
+    }
+    
+    .ticket-hero h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        background: linear-gradient(135deg, #fff 0%, #e31b23 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .ticket-hero p {
+        color: #888;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Форма */
+    .form-wrapper {
+        background: linear-gradient(135deg, #0f0f0f 0%, #0a0a0a 100%);
+        padding: 60px 0;
+        min-height: calc(100vh - 400px);
+    }
+    
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: rgba(26, 26, 26, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .form-container h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 10px;
+    }
+    
+    .form-container h2 i {
+        color: #e31b23;
+        margin-right: 10px;
+    }
+    
+    .form-subtitle {
+        color: #666;
+        font-size: 0.85rem;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .error-message {
+        background: rgba(227, 27, 35, 0.15);
+        border: 1px solid #e31b23;
+        color: #e31b23;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .error-message i {
+        font-size: 1.2rem;
+    }
+    
+    /* Группы полей */
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #ccc;
+        font-weight: 500;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-group label .required {
+        color: #e31b23;
+        margin-left: 4px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 18px;
+        background: rgba(20, 20, 20, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: 'Montserrat', sans-serif;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #e31b23;
+        background: rgba(20, 20, 20, 1);
+        box-shadow: 0 0 15px rgba(227, 27, 35, 0.2);
+    }
+    
+    .form-group input:hover,
+    .form-group select:hover,
+    .form-group textarea:hover {
+        border-color: rgba(227, 27, 35, 0.5);
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+        line-height: 1.6;
+    }
+    
+    .form-group select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23e31b23' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 18px center;
+        background-size: 20px;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    /* Чекбокс срочности */
+    .urgency-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .urgency-option {
+        flex: 1;
+        position: relative;
+    }
+    
+    .urgency-option input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .urgency-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 15px;
+        background: rgba(20, 20, 20, 0.8);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .urgency-option input:checked + .urgency-label {
+        border-color: #e31b23;
+        background: rgba(227, 27, 35, 0.1);
+        box-shadow: 0 5px 15px rgba(227, 27, 35, 0.2);
+    }
+    
+    .urgency-label i {
+        font-size: 1.5rem;
+        color: #888;
+        transition: color 0.3s ease;
+    }
+    
+    .urgency-option input:checked + .urgency-label i {
+        color: #e31b23;
+    }
+    
+    .urgency-label span:first-of-type {
+        font-weight: 600;
+        color: white;
+    }
+    
+    .urgency-label .urgency-desc {
+        font-size: 0.7rem;
+        color: #666;
+    }
+    
+    /* Кнопка отправки */
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #e31b23 0%, #b3050f 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(227, 27, 35, 0.3);
+    }
+    
+    .btn-submit:disabled {
+        opacity: 0.7;
+        transform: none;
+        cursor: not-allowed;
+    }
+    
+    /* Прогресс-бар */
+    .form-progress {
+        margin-bottom: 30px;
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .progress-steps::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 0;
+    }
+    
+    .progress-step {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        flex: 1;
+    }
+    
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        background: #1a1a1a;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    
+    .progress-step.active .step-circle {
+        background: #e31b23;
+        border-color: #e31b23;
+        color: white;
+        box-shadow: 0 0 15px rgba(227, 27, 35, 0.5);
+    }
+    
+    .progress-step.completed .step-circle {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    
+    .step-label {
+        font-size: 0.7rem;
+        color: #666;
+    }
+    
+    .progress-step.active .step-label {
+        color: #e31b23;
+    }
+    
+    /* Адаптив */
+    @media (max-width: 768px) {
+        .ticket-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .form-container {
+            margin: 0 20px;
+            padding: 25px;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        
+        .urgency-buttons {
+            flex-direction: column;
+        }
+        
+        .progress-steps::before {
+            top: 12px;
+        }
+        
+        .step-label {
+            display: none;
+        }
+    }
+</style>
+
+<main>
+    <!-- Hero секция -->
+    <div class="ticket-hero">
+        <div class="container">
+            <h1>Создание заявки</h1>
+            <p>Заполните форму, и наш специалист свяжется с вами в ближайшее время</p>
+        </div>
+    </div>
+    
+    <!-- Форма -->
+    <div class="form-wrapper">
+        <div class="container">
+            <div class="form-container">
+                <h2><i class="fas fa-clipboard-list"></i> Новая заявка</h2>
+                <div class="form-subtitle">Пожалуйста, заполните все обязательные поля</div>
+                
+                <!-- Прогресс -->
+                <div class="form-progress">
+                    <div class="progress-steps">
+                        <div class="progress-step active" data-step="1">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Оборудование</div>
+                        </div>
+                        <div class="progress-step" data-step="2">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Проблема</div>
+                        </div>
+                        <div class="progress-step" data-step="3">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">Контакты</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <% if (error) { %>
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <form action="/tickets/new" method="POST" id="ticketForm">
+                    <!-- Шаг 1: Оборудование -->
+                    <div class="form-step" data-step="1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Тип оборудования <span class="required">*</span></label>
+                                <select name="equipment_type" required>
+                                    <option value="">Выберите тип</option>
+                                    <option value="Шлагбаум">🚧 Шлагбаум</option>
+                                    <option value="Роллетные ворота">📦 Роллетные ворота</option>
+                                    <option value="Откатные ворота">🚪 Откатные ворота</option>
+                                    <option value="Распашные ворота">🚪 Распашные ворота</option>
+                                    <option value="Промышленные ворота">🏭 Промышленные ворота</option>
+                                    <option value="Привод Alutech">⚙️ Привод Alutech</option>
+                                    <option value="Привод Nice">⚙️ Привод Nice</option>
+                                    <option value="Другое">📌 Другое</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Модель оборудования</label>
+                                <input type="text" name="model" placeholder="Например: Levigato 300">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Шаг 2: Проблема -->
+                    <div class="form-step" data-step="2" style="display: none;">
+                        <div class="form-group">
+                            <label>Тема заявки <span class="required">*</span></label>
+                            <input type="text" name="subject" placeholder="Кратко опишите проблему" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Описание проблемы <span class="required">*</span></label>
+                            <textarea name="description" placeholder="Подробно опишите, что случилось, когда появилась проблема, какие ошибки видите..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Срочность <span class="required">*</span></label>
+                            <div class="urgency-buttons">
+                                <label class="urgency-option">
+                                    <input type="radio" name="urgency" value="normal" checked>
+                                    <div class="urgency-label">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Обычная</span>
+                                        <span class="urgency-desc">2-3 дня</span>
+                                    </div>
+                                </label>
+                                <label class="urgency-option">
+                                    <input type="radio" name="urgency" value="urgent">
+                                    <div class="urgency-label">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>Срочная</span>
+                                        <span class="urgency-desc">24 часа</span>
+                                    </div>
+                                </label>
+                                <label class="urgency-option">
+                                    <input type="radio" name="urgency" value="emergency">
+                                    <div class="urgency-label">
+                                        <i class="fas fa-bell"></i>
+                                        <span>Аварийная</span>
+                                        <span class="urgency-desc">2 часа</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Шаг 3: Контакты -->
+                    <div class="form-step" data-step="3" style="display: none;">
+                        <div class="form-group">
+                            <label>Удобное время для визита</label>
+                            <select name="preferred_time">
+                                <option value="">Не важно</option>
+                                <option value="morning">🌅 09:00 - 12:00</option>
+                                <option value="day">☀️ 12:00 - 15:00</option>
+                                <option value="afternoon">🌇 15:00 - 18:00</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Адрес объекта</label>
+                            <input type="text" name="address" placeholder="г. Оренбург, ул. Примерная, д. 1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Контактный телефон</label>
+                            <input type="tel" name="phone" placeholder="+7 (900) 000-00-00">
+                        </div>
+                    </div>
+                    
+                    <!-- Навигация -->
+                    <div style="display: flex; justify-content: space-between; gap: 15px; margin-top: 20px;">
+                        <button type="button" id="prevBtn" class="btn-submit" style="background: #333; width: auto; padding: 12px 25px; display: none;">
+                            <i class="fas fa-arrow-left"></i> Назад
+                        </button>
+                        <button type="button" id="nextBtn" class="btn-submit" style="width: auto; padding: 12px 25px;">
+                            Далее <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="submit" id="submitBtn" class="btn-submit" style="display: none;">
+                            <i class="fas fa-paper-plane"></i> Отправить заявку
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Пошаговая форма
+    let currentStep = 1;
+    const totalSteps = 3;
+    
+    const steps = document.querySelectorAll('.form-step');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('ticketForm');
+    
+    function updateSteps() {
+        // Показываем/скрываем шаги
+        steps.forEach(step => {
+            if (parseInt(step.dataset.step) === currentStep) {
+                step.style.display = 'block';
+            } else {
+                step.style.display = 'none';
+            }
+        });
+        
+        // Обновляем прогресс
+        progressSteps.forEach((step, index) => {
+            const stepNum = index + 1;
+            if (stepNum === currentStep) {
+                step.classList.add('active');
+                step.classList.remove('completed');
+            } else if (stepNum < currentStep) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+            } else {
+                step.classList.remove('active', 'completed');
+            }
+        });
+        
+        // Кнопки навигации
+        if (currentStep === 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'flex';
+            submitBtn.style.display = 'none';
+        } else if (currentStep === totalSteps) {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'flex';
+        } else {
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+            submitBtn.style.display = 'none';
+        }
+    }
+    
+    function validateStep(step) {
+        const currentStepDiv = document.querySelector(`.form-step[data-step="${step}"]`);
+        const requiredFields = currentStepDiv.querySelectorAll('[required]');
+        
+        for (let field of requiredFields) {
+            if (!field.value.trim()) {
+                field.style.borderColor = '#e31b23';
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                alert('Пожалуйста, заполните все обязательные поля');
+                return false;
+            }
+            field.style.borderColor = '';
+        }
+        return true;
+    }
+    
+    nextBtn.addEventListener('click', () => {
+        if (validateStep(currentStep)) {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateSteps();
+            }
+        }
+    });
+    
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 1) {
+            currentStep--;
+            updateSteps();
+        }
+    });
+    
+    // Валидация перед отправкой
+    form.addEventListener('submit', function(e) {
+        // Проверяем последний шаг
+        if (!validateStep(3)) {
+            e.preventDefault();
+            currentStep = 3;
+            updateSteps();
+            return false;
+        }
+        
+        const subject = document.querySelector('input[name="subject"]').value.trim();
+        const description = document.querySelector('textarea[name="description"]').value.trim();
+        
+        if (!subject || !description) {
+            e.preventDefault();
+            alert('Пожалуйста, заполните тему и описание проблемы');
+            currentStep = 2;
+            updateSteps();
+            return false;
+        }
+        
+        // Показываем индикатор загрузки
+        const btn = submitBtn;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+        btn.disabled = true;
+    });
+    
+    // Убираем красную рамку при вводе
+    document.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('input', function() {
+            this.style.borderColor = '';
+        });
+    });
+    
+    // Инициализация
+    updateSteps();
+    
+    // Маска для телефона (опционально)
+    const phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.length === 11) {
+                this.value = value.replace(/(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ($2) $3-$4-$5');
+            } else {
+                this.value = value;
+            }
+        });
+    }
+</script>
+
+<%- include('partials/footer') %>

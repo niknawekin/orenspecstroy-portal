@@ -1,0 +1,161 @@
+<%- include('../partials/header') %>
+
+<style>
+    .admin-ticket-container {
+        max-width: 1000px;
+        margin: 100px auto 60px;
+        padding: 0 20px;
+    }
+    .ticket-card {
+        background: #1a1a1a;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid #333;
+    }
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #333;
+    }
+    .ticket-id {
+        color: #e31b23;
+        font-weight: bold;
+    }
+    .status-select {
+        background: #2a2a2a;
+        color: white;
+        border: 1px solid #e31b23;
+        padding: 8px 16px;
+        border-radius: 8px;
+    }
+    .info-row {
+        display: flex;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: #0f0f0f;
+        border-radius: 8px;
+    }
+    .info-label {
+        width: 150px;
+        color: #888;
+        font-weight: 500;
+    }
+    .info-value {
+        flex: 1;
+        color: white;
+    }
+    .btn-back {
+        display: inline-block;
+        background: #333;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+    .btn-back:hover {
+        background: #e31b23;
+    }
+    .urgency-emergency {
+        color: #e31b23;
+        font-weight: bold;
+    }
+    .urgency-urgent {
+        color: #ffc107;
+    }
+</style>
+
+<main>
+    <div class="admin-ticket-container">
+        <a href="/admin" class="btn-back">← Назад к списку</a>
+        
+        <div class="ticket-card">
+            <div class="ticket-header">
+                <h2>Заявка №<%= ticket.id %></h2>
+                <select class="status-select" onchange="updateStatus(<%= ticket.id %>, this.value)">
+                    <option value="Новая" <%= ticket.status === 'Новая' ? 'selected' : '' %>>Новая</option>
+                    <option value="В обработке" <%= ticket.status === 'В обработке' ? 'selected' : '' %>>В обработке</option>
+                    <option value="Завершено" <%= ticket.status === 'Завершено' ? 'selected' : '' %>>Завершено</option>
+                </select>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Клиент:</div>
+                <div class="info-value"><%= ticket.user_fio || 'Не указан' %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Email:</div>
+                <div class="info-value"><%= ticket.user_email || 'Не указан' %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Телефон:</div>
+                <div class="info-value"><%= ticket.user_phone || ticket.phone || 'Не указан' %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Тема:</div>
+                <div class="info-value"><%= ticket.subject %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Описание:</div>
+                <div class="info-value"><%= ticket.description %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Тип оборудования:</div>
+                <div class="info-value"><%= ticket.equipment_type || 'Не указан' %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Модель:</div>
+                <div class="info-value"><%= ticket.model || 'Не указана' %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Срочность:</div>
+                <div class="info-value">
+                    <span class="<%= ticket.urgency === 'emergency' ? 'urgency-emergency' : (ticket.urgency === 'urgent' ? 'urgency-urgent' : '') %>">
+                        <%= ticket.urgency === 'emergency' ? '🚨 АВАРИЙНАЯ' : (ticket.urgency === 'urgent' ? '⚠️ Срочная' : 'Обычная') %>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Адрес:</div>
+                <div class="info-value"><%= ticket.address || 'Не указан' %></div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">Дата создания:</div>
+                <div class="info-value"><%= new Date(ticket.created_at).toLocaleString('ru-RU') %></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+function updateStatus(ticketId, status) {
+    fetch('/admin/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticketId, status })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Ошибка обновления статуса');
+        }
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>

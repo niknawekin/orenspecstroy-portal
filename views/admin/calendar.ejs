@@ -1,0 +1,277 @@
+<%- include('../partials/header') %>
+
+<style>
+    .calendar-page {
+        padding-top: 100px;
+        padding-bottom: 60px;
+        background: #0a0a0a;
+        min-height: 100vh;
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .date-nav {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .date-nav button {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+    }
+    
+    .calendar-grid {
+        background: #1a1a1a;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: 100px repeat(7, 1fr);
+        background: #e31b23;
+    }
+    
+    .calendar-weekdays div {
+        padding: 15px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .calendar-rows {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .calendar-row {
+        display: grid;
+        grid-template-columns: 100px repeat(7, 1fr);
+        border-bottom: 1px solid #333;
+    }
+    
+    .time-cell {
+        background: #0f0f0f;
+        padding: 10px;
+        text-align: center;
+        font-weight: 600;
+        color: #e31b23;
+        border-right: 1px solid #333;
+    }
+    
+    .slot-cell {
+        padding: 8px;
+        border-right: 1px solid #333;
+        min-height: 70px;
+    }
+    
+    .slot-booked {
+        background: rgba(227, 27, 35, 0.2);
+        border-left: 3px solid #e31b23;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    .slot-free {
+        background: rgba(40, 167, 69, 0.1);
+        border: 1px dashed #28a745;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        color: #28a745;
+    }
+    
+    .slot-free:hover {
+        background: rgba(40, 167, 69, 0.2);
+    }
+    
+    .booking-info {
+        font-size: 0.75rem;
+    }
+    
+    .booking-info strong {
+        display: block;
+        margin-bottom: 4px;
+    }
+    
+    .btn-cancel {
+        background: none;
+        border: none;
+        color: #e31b23;
+        cursor: pointer;
+        font-size: 0.7rem;
+        margin-top: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .calendar-grid {
+            overflow-x: auto;
+        }
+        .calendar-weekdays, .calendar-row {
+            min-width: 800px;
+        }
+    }
+</style>
+
+<main class="calendar-page">
+    <div class="container">
+        <div class="calendar-header">
+            <div>
+                <h1><i class="fas fa-calendar-alt"></i> Календарь специалиста</h1>
+                <p style="color: #888;"><%= specialist.fio %> - <%= specialist.specialization || 'Специалист' %></p>
+            </div>
+            <div class="date-nav">
+                <button onclick="changeWeek(-1)"><i class="fas fa-chevron-left"></i></button>
+                <span id="currentWeek" style="font-weight: 600;"></span>
+                <button onclick="changeWeek(1)"><i class="fas fa-chevron-right"></i></button>
+                <a href="/admin/specialists" class="btn-back" style="background: #333; padding: 10px 20px; border-radius: 10px; text-decoration: none; color: white;">← Назад</a>
+            </div>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Календарь будет отрисован через JS -->
+        </div>
+    </div>
+</main>
+
+<script>
+    let currentDate = new Date();
+    const specialistId = <%= specialist.id %>;
+    const timeSlots = <%= JSON.stringify(timeSlots) %>;
+    let schedule = <%= JSON.stringify(schedule) %>;
+    
+    function getWeekDates(date) {
+        const start = new Date(date);
+        const day = start.getDay();
+        const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+        const weekDates = [];
+        
+        for(let i = 0; i < 7; i++) {
+            const d = new Date(start);
+            d.setDate(diff + i);
+            weekDates.push(d);
+        }
+        return weekDates;
+    }
+    
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+    
+    function isSlotBooked(date, timeSlot) {
+        return schedule.find(s => s.date === date && s.time_slot === timeSlot && s.is_booked === 1);
+    }
+    
+    function renderCalendar() {
+        const weekDates = getWeekDates(currentDate);
+        const weekStart = weekDates[0];
+        const weekEnd = weekDates[6];
+        
+        document.getElementById('currentWeek').innerText = 
+            `${weekStart.toLocaleDateString('ru-RU')} - ${weekEnd.toLocaleDateString('ru-RU')}`;
+        
+        let html = `
+            <div class="calendar-weekdays">
+                <div>Время</div>
+        `;
+        
+        weekDates.forEach(date => {
+            const isToday = formatDate(date) === formatDate(new Date());
+            html += `<div style="${isToday ? 'background: rgba(227,27,35,0.3);' : ''}">
+                ${date.toLocaleDateString('ru-RU', {weekday: 'short'})}<br>
+                <strong>${date.getDate()}</strong>
+            </div>`;
+        });
+        html += `</div><div class="calendar-rows">`;
+        
+        timeSlots.forEach(slot => {
+            html += `<div class="calendar-row">
+                <div class="time-cell">${slot.slot_time}</div>`;
+            
+            weekDates.forEach(date => {
+                const dateStr = formatDate(date);
+                const booked = isSlotBooked(dateStr, slot.slot_time);
+                
+                if(booked) {
+                    html += `<div class="slot-cell">
+                        <div class="slot-booked" onclick="viewBooking(${booked.id})">
+                            <div class="booking-info">
+                                <strong>${booked.client_fio || 'Клиент'}</strong>
+                                <small>${booked.ticket_subject || 'Заявка'}</small>
+                                <button class="btn-cancel" onclick="event.stopPropagation(); cancelBooking(${booked.id})">✖ Отменить</button>
+                            </div>
+                        </div>
+                    </div>`;
+                } else {
+                    html += `<div class="slot-cell">
+                        <div class="slot-free" onclick="addBooking('${dateStr}', '${slot.slot_time}')">
+                            <i class="fas fa-plus"></i> Свободно
+                        </div>
+                    </div>`;
+                }
+            });
+            html += `</div>`;
+        });
+        
+        html += `</div>`;
+        document.getElementById('calendarGrid').innerHTML = html;
+    }
+    
+    function changeWeek(delta) {
+        currentDate.setDate(currentDate.getDate() + delta * 7);
+        renderCalendar();
+    }
+    
+    function addBooking(date, timeSlot) {
+        const ticketId = prompt('Введите ID заявки для бронирования:');
+        if(ticketId) {
+            fetch('/admin/schedule/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    specialist_id: specialistId,
+                    date: date,
+                    time_slot: timeSlot,
+                    ticket_id: ticketId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) location.reload();
+                else alert('Ошибка: ' + data.error);
+            });
+        }
+    }
+    
+    function cancelBooking(scheduleId) {
+        if(confirm('Отменить бронирование?')) {
+            fetch(`/admin/schedule/${scheduleId}/cancel`, {method: 'POST'})
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) location.reload();
+                    else alert('Ошибка');
+                });
+        }
+    }
+    
+    function viewBooking(scheduleId) {
+        window.location.href = `/admin/tickets/${scheduleId}`;
+    }
+    
+    renderCalendar();
+</script>
+
+<%- include('../partials/footer') %>

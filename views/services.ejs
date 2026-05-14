@@ -1,0 +1,133 @@
+<%- include('partials/header') %>
+
+<main style="background: var(--light-grey); padding-bottom: 100px;">
+    <section class="parallax-hero" style="height: 50vh;">
+        <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=2000'); filter: brightness(0.3);"></div>
+        <div class="hero-content">
+            <h1 class="reveal">Наши Услуги</h1>
+            <p class="reveal delay-1">Полный цикл сопровождения ворот и автоматики</p>
+        </div>
+    </section>
+
+    <div class="container" style="margin-top: 50px;">
+        <h2 class="reveal" style="text-align:center; margin-bottom:40px;">Профессиональный сервис «Оренспецстрой»</h2>
+        
+        <div class="services-list">
+            <div class="card-glass reveal reveal-left" style="padding: 30px; margin-bottom: 20px;">
+                <h3><i class="fas fa-tools"></i> Техническое обслуживание (ТО)</h3>
+                <p>Регламентные работы: проверка натяжения пружин, смазка роликов и петель, регулировка автоматики. Позволяет избежать дорогостоящего ремонта в будущем.</p>
+            </div>
+
+            <div class="card-glass reveal reveal-right" style="padding: 30px; margin-bottom: 20px;">
+                <h3><i class="fas fa-truck-pickup"></i> Срочный выезд специалиста</h3>
+                <p>Диагностика неисправности на месте. Если ворота заблокированы или шлагбаум не реагирует на пульт — наш инженер приедет в течение 3-х часов.</p>
+            </div>
+
+            <div class="card-glass reveal reveal-left" style="padding: 30px; margin-bottom: 20px;">
+                <h3><i class="fas fa-microchip"></i> Программирование и настройка</h3>
+                <p>Запись новых пультов, настройка GSM-модулей для открытия с телефона, синхронизация систем контроля доступа (СКУД).</p>
+            </div>
+
+            <div class="card-glass reveal reveal-right" style="padding: 30px; margin-bottom: 20px;">
+                <h3><i class="fas fa-shield-alt"></i> Гарантийный ремонт</h3>
+                <p>Бесплатное устранение заводских дефектов и замена узлов в течение всего гарантийного срока эксплуатации оборудования.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <section class="price-section reveal" style="padding: 80px 0;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 40px; text-transform: uppercase; font-weight: 900;">Прайс-лист на услуги</h2>
+
+            <div class="tabs-container" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 50px;">
+                <button class="tab-btn active" data-filter="all">Все</button>
+                <button class="tab-btn" data-filter="gates">Ворота</button>
+                <button class="tab-btn" data-filter="barriers">Шлагбаумы</button>
+                <button class="tab-btn" data-filter="auto">Автоматика</button>
+            </div>
+
+            <div class="services-price-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+                
+                <div class="price-card" data-category="gates">
+                    <div class="price-header">Выезд и диагностика</div>
+                    <div class="price-value">от 1 500 ₽</div>
+                    <p>Проверка геометрии ворот, роликов и натяжения тросов.</p>
+                </div>
+
+                <div class="price-card" data-category="barriers">
+                    <div class="price-header">Настройка стрелы</div>
+                    <div class="price-value">от 2 000 ₽</div>
+                    <p>Балансировка пружин, регулировка концевых выключателей.</p>
+                </div>
+
+                <div class="price-card" data-category="auto">
+                    <div class="price-header">Прошивка пультов</div>
+                    <div class="price-value">500 ₽/шт</div>
+                    <p>Запись новых брелоков-передатчиков в память приемника.</p>
+                </div>
+
+                <div class="price-card" data-category="gates">
+                    <div class="price-header">Замена роликов</div>
+                    <div class="price-value">от 3 500 ₽</div>
+                    <p>Включая стоимость комплекта усиленных роликов Alutech.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <section class="quick-action-section reveal">
+        <div class="container">
+            <div class="emergency-dashboard">
+                <div class="emergency-main">
+                    <div class="emergency-badge">Status: Critical</div>
+                    <h2>Проблема требует немедленного решения?</h2>
+                    <p>Аварийная служба «Оренспецстрой» работает круглосуточно. Заблокированные ворота или неисправный шлагбаум — это вопрос безопасности.</p>
+                    <a href="tel:+73532000000" class="emergency-btn">
+                        <i class="fas fa-phone-alt"></i> Вызвать мастера
+                    </a>
+                </div>
+
+                <div class="emergency-gauge">
+                    <div class="gauge-container">
+                        <svg viewBox="0 0 100 100" class="gauge-svg">
+                            <circle class="gauge-base" cx="50" cy="50" r="45"></circle>
+                            <circle class="gauge-progress" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <div class="gauge-content">
+                            <span class="gauge-value">45</span>
+                            <span class="gauge-unit">минут</span>
+                        </div>
+                    </div>
+                    <div class="gauge-label">Среднее время прибытия</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="comparison-section reveal" style="padding: 80px 0; background: #fff;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 20px; text-transform: uppercase; font-weight: 900;">Результаты нашей работы</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 50px;">Подвигайте разделитель, чтобы оценить качество восстановления</p>
+
+            <div class="before-after-container">
+                <div class="img background-img" style="background-image: url('https://avatars.mds.yandex.net/get-ydo/14333158/2a00000195d28a6644bc3bf8a99f9581ec4c/diploma');">
+                    <div class="label after">После ремонта</div>
+                </div>
+                
+                <div class="img foreground-img" style="background-image: url('https://avatars.mds.yandex.net/get-altay/14297579/2a0000019668bbf0c137d0c566fea16ea916/XXXL'); filter: grayscale(1) contrast(1.2);">
+                    <div class="label before">До ремонта</div>
+                </div>
+
+                <input type="range" min="1" max="100" value="50" class="slider" id="compare-slider">
+                <div class="slider-button"></div>
+                <div class="slider-line"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

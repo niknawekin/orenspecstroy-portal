@@ -1,0 +1,449 @@
+<%- include('partials/header') %>
+
+<style>
+    .dashboard-wrapper {
+        background: linear-gradient(135deg, #0a0a0a 0%, #0f0f0f 100%);
+        min-height: 100vh;
+        padding-top: 100px;
+        padding-bottom: 60px;
+    }
+    
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+    }
+    
+    /* Welcome Header */
+    .welcome-header {
+        margin-bottom: 40px;
+    }
+    
+    .welcome-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #fff 0%, #e31b23 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+    
+    .welcome-header p {
+        color: #888;
+        font-size: 1rem;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        border-color: #e31b23;
+        transform: translateY(-5px);
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 2rem;
+        color: #e31b23;
+        margin-bottom: 15px;
+    }
+    
+    .stat-card .stat-label {
+        display: block;
+        color: #888;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+    }
+    
+    /* Action Button */
+    .action-bar {
+        margin-bottom: 40px;
+    }
+    
+    .btn-new-ticket {
+        background: linear-gradient(135deg, #e31b23 0%, #b3050f 100%);
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-new-ticket:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(227, 27, 35, 0.3);
+    }
+    
+    /* Tickets Section */
+    .tickets-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 24px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .tickets-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .tickets-header h2 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .tickets-header h2 i {
+        color: #e31b23;
+        margin-right: 10px;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .filter-btn {
+        background: transparent;
+        border: 1px solid #333;
+        color: #888;
+        padding: 6px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+    }
+    
+    .filter-btn.active, .filter-btn:hover {
+        background: #e31b23;
+        border-color: #e31b23;
+        color: white;
+    }
+    
+    /* Ticket Card */
+    .ticket-card {
+        background: rgba(20, 20, 20, 0.8);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .ticket-card:hover {
+        border-color: #e31b23;
+        transform: translateX(5px);
+    }
+    
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .ticket-id {
+        font-size: 0.75rem;
+        color: #e31b23;
+        font-weight: 600;
+    }
+    
+    .ticket-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .status-processing {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+    }
+    
+    .status-done {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+    
+    .status-new {
+        background: rgba(23, 162, 184, 0.2);
+        color: #17a2b8;
+        border: 1px solid #17a2b8;
+    }
+    
+    .ticket-subject {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 8px;
+    }
+    
+    .ticket-description {
+        font-size: 0.85rem;
+        color: #aaa;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+    
+    .ticket-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .ticket-date {
+        font-size: 0.7rem;
+        color: #666;
+    }
+    
+    .ticket-date i {
+        margin-right: 5px;
+    }
+    
+    .ticket-urgency {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: rgba(227, 27, 35, 0.1);
+        color: #e31b23;
+    }
+    
+    .btn-view-ticket {
+        background: transparent;
+        border: 1px solid #e31b23;
+        color: #e31b23;
+        padding: 6px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view-ticket:hover {
+        background: #e31b23;
+        color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state p {
+        color: #888;
+        margin-bottom: 20px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 0 20px;
+        }
+        
+        .welcome-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .tickets-section {
+            padding: 20px;
+        }
+        
+        .ticket-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<main class="dashboard-wrapper">
+    <div class="dashboard-container">
+        <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <h1>Личный кабинет</h1>
+                <p>Добро пожаловать, <strong><%= user.fio %></strong>!</p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <a href="/tickets/new" class="btn-new-ticket" style="background: #e31b23; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+                    <i class="fas fa-plus"></i> Новая заявка
+                </a>
+                <a href="/logout" class="btn-logout" style="background: #333; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; transition: 0.3s;">
+                    <i class="fas fa-sign-out-alt"></i> Выйти
+                </a>
+            </div>
+        </div>
+        <!-- Welcome Header -->
+        <div class="welcome-header">
+            <h1>Привет, <%= user.fio.split(' ')[0] %>!</h1>
+            <p>Добро пожаловать в сервисный портал. Здесь вы можете отслеживать свои заявки и создавать новые.</p>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                <span class="stat-label">Всего заявок</span>
+                <span class="stat-value"><%= tickets.length %></span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                <span class="stat-label">В обработке</span>
+                <span class="stat-value"><%= tickets.filter(t => t.status === 'В обработке' || t.status === 'new').length %></span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <span class="stat-label">Выполнено</span>
+                <span class="stat-value"><%= tickets.filter(t => t.status === 'Завершено' || t.status === 'done').length %></span>
+            </div>
+        </div>
+        
+        <!-- Action Button -->
+        <div class="action-bar">
+            <a href="/tickets/new" class="btn-new-ticket">
+                <i class="fas fa-plus"></i> Создать заявку
+            </a>
+        </div>
+        
+        <!-- Tickets List -->
+        <div class="tickets-section">
+            <div class="tickets-header">
+                <h2><i class="fas fa-list"></i> Мои заявки</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Все</button>
+                    <button class="filter-btn" data-filter="processing">В обработке</button>
+                    <button class="filter-btn" data-filter="done">Выполненные</button>
+                </div>
+            </div>
+            
+            <div class="tickets-list" id="ticketsList">
+                <% if (tickets && tickets.length > 0) { %>
+                    <% tickets.forEach(ticket => { 
+                        let statusClass = 'status-processing';
+                        let statusText = 'В обработке';
+                        
+                        if (ticket.status === 'Завершено' || ticket.status === 'done') {
+                            statusClass = 'status-done';
+                            statusText = 'Выполнена';
+                        } else if (ticket.status === 'new' || ticket.status === 'open') {
+                            statusClass = 'status-new';
+                            statusText = 'Новая';
+                        }
+                    %>
+                        <div class="ticket-card" data-status="<%= statusText === 'Выполнена' ? 'done' : 'processing' %>">
+                            <div class="ticket-header">
+                                <span class="ticket-id">Заявка №<%= ticket.id %></span>
+                                <span class="ticket-status <%= statusClass %>"><%= statusText %></span>
+                            </div>
+                            <div class="ticket-subject"><%= ticket.subject %></div>
+                            <div class="ticket-description">
+                                <%= ticket.description ? ticket.description.substring(0, 120) + (ticket.description.length > 120 ? '...' : '') : 'Описание отсутствует' %>
+                            </div>
+                            <div class="ticket-footer">
+                                <div class="ticket-date">
+                                    <i class="far fa-calendar-alt"></i> <%= new Date(ticket.created_at).toLocaleDateString('ru-RU') %>
+                                </div>
+                                <% if (ticket.urgency && ticket.urgency !== 'normal') { %>
+                                    <span class="ticket-urgency">
+                                        <i class="fas fa-exclamation-triangle"></i> 
+                                        <%= ticket.urgency === 'urgent' ? 'Срочная' : 'Аварийная' %>
+                                    </span>
+                                <% } %>
+                                <a href="/tickets/view/<%= ticket.id %>" class="btn-view-ticket">
+                                    Подробнее <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>У вас пока нет заявок</p>
+                        <a href="/tickets/new" class="btn-new-ticket">Создать первую заявку</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+    </div>
+</main>
+
+<script>
+    // Фильтрация заявок
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const tickets = document.querySelectorAll('.ticket-card');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Обновляем активную кнопку
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter');
+            
+            tickets.forEach(ticket => {
+                if (filter === 'all') {
+                    ticket.style.display = 'block';
+                } else if (filter === 'processing') {
+                    if (ticket.getAttribute('data-status') === 'processing') {
+                        ticket.style.display = 'block';
+                    } else {
+                        ticket.style.display = 'none';
+                    }
+                } else if (filter === 'done') {
+                    if (ticket.getAttribute('data-status') === 'done') {
+                        ticket.style.display = 'block';
+                    } else {
+                        ticket.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<%- include('partials/footer') %>

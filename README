@@ -1,0 +1,10 @@
+npm install express ejs sqlite3 sqlite body-parser dotenv bcrypt - для запуска
+
+
+npm install express sqlite3 bcrypt express-session body-parser dotenv ejs
+
+
+C:\Users\Никита\AppData\Local\Programs\Ollama\ollama.exe pull mistral скачивание олламы
+C:\Users\Никита\AppData\Local\Programs\Ollama\ollama.exe list проверка
+6. Отзывы в формате мессенджера
+Раз тебе нравится стиль сообщений, можно оформить отзывы как «скриншоты» из чата с благодарными клиентами. Это выглядит современнее, чем скучные блоки текста.
