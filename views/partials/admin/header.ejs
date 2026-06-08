@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СПТС-ОСС | Панель администратора</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+</head>
+<style>
+    /* В твоем блоке <style> замени .sidebar на .admin-sidebar */
+    .admin-sidebar {
+        width: 280px; /* Было 250, поправил под твой HTML */
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        transition: transform 0.3s ease;
+        background: #121212;
+        border-right: 1px solid #222;
+        z-index: 1000;
+    }
+
+    .admin-sidebar.hidden {
+        transform: translateX(-280px); /* Сдвигаем на ширину сайдбара */
+    }
+
+    .admin-main-content {
+        margin-left: 280px; /* Контент отступает на ширину сайдбара */
+        transition: margin-left 0.3s ease;
+    }
+
+    .admin-main-content.expanded {
+        margin-left: 0; /* Контент растягивается */
+    }
+
+    /* Стили для стрелочки-триггера */
+    .sidebar-trigger {
+        position: fixed;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #e31b23;
+        color: white;
+        padding: 15px 5px;
+        border-radius: 0 8px 8px 0;
+        cursor: pointer;
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* Показываем стрелку только когда сайдбар скрыт */
+    .admin-sidebar.hidden + .sidebar-trigger {
+        opacity: 1;
+    }
+
+    /* Эффект при наведении на стрелку */
+    .sidebar-trigger:hover {
+        background: #b3050f;
+    }
+</style>
+<body style="background-color: #0a0a0a; color: #ffffff;">
+    <div class="admin-layout" style="display: flex; min-height: 100vh;">
+       
+<aside class="admin-sidebar" style="width: 280px; background: #121212; border-right: 1px solid #222; padding: 20px; display: flex; flex-direction: column;">
+    <div class="sidebar-logo" style="margin-bottom: 40px; padding: 10px 0;">
+        <a href="/admin" style="text-decoration: none; color: #ffffff; font-size: 1.2rem; font-weight: 900; letter-spacing: 1px;">
+            <span style="color: var(--primary-red, #EF4A20);">ОРЕН</span>СПЕЦСТРОЙ
+        </a>
+        <div style="font-size: 0.65rem; color: #666; margin-top: 5px; letter-spacing: 2px;">CONTROL PANEL</div>
+    </div>
+    <button id="toggleSidebar" style="background:none; border:none; color:#e31b23; padding:15px; cursor:pointer; font-size: 1.2rem;">
+        <i class="fas fa-bars"></i>
+    </button>
+    <nav class="sidebar-nav" style="flex: 1;">
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+            <li>
+                <a href="/admin" style="display: flex; align-items: center; gap: 15px; color: #fff; text-decoration: none; padding: 12px 15px; border-radius: 8px; background: #1a1a1a;">
+                    <i class="fas fa-chart-pie" style="color: var(--primary-red, #EF4A20); width: 20px;"></i>
+                    <span>Главная</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/tickets" style="display: flex; align-items: center; gap: 15px; color: #aaa; text-decoration: none; padding: 12px 15px; border-radius: 8px; transition: 0.3s;">
+                    <i class="fas fa-ticket-alt" style="width: 20px;"></i>
+                    <span>Заявки</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/users" style="display: flex; align-items: center; gap: 15px; color: #aaa; text-decoration: none; padding: 12px 15px; border-radius: 8px; transition: 0.3s;">
+                    <i class="fas fa-users" style="width: 20px;"></i>
+                    <span>Пользователи</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/specialists" style="display: flex; align-items: center; gap: 15px; color: #aaa; text-decoration: none; padding: 12px 15px; border-radius: 8px; transition: 0.3s;">
+                    <i class="fas fa-user-cog" style="width: 20px;"></i>
+                    <span>Специалисты</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/calendar" style="display: flex; align-items: center; gap: 15px; color: #aaa; text-decoration: none; padding: 12px 15px; border-radius: 8px; transition: 0.3s;">
+                    <i class="fas fa-calendar-alt" style="width: 20px;"></i>
+                    <span>Календарь</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #222;">
+        <a href="/logout" class="btn-logout" style="display: flex; align-items: center; gap: 15px; color: #EF4A20; text-decoration: none; font-weight: bold; transition: 0.3s;">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Выйти из системы</span>
+        </a>
+    </div>
+</aside>
+<div id="sidebarTrigger" class="sidebar-trigger">
+    <i class="fas fa-chevron-right"></i>
+</div>
+
+<div class="admin-main-content" style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+
+<script>
+    const sidebar = document.querySelector('.admin-sidebar');
+    const mainContent = document.querySelector('.admin-main-content');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const trigger = document.getElementById('sidebarTrigger');
+
+    // Функция переключения
+    function toggleSidebar() {
+        sidebar.classList.toggle('hidden');
+        mainContent.classList.toggle('expanded');
+        
+        // Сохраняем состояние (чтобы меню не открывалось само при перезагрузке)
+        const isHidden = sidebar.classList.contains('hidden');
+        localStorage.setItem('sidebarHidden', isHidden);
+    }
+
+    // Слушатели событий
+    toggleBtn.addEventListener('click', toggleSidebar);
+    trigger.addEventListener('click', toggleSidebar);
+
+    // Восстановление состояния при загрузке страницы
+    window.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('sidebarHidden') === 'true') {
+            sidebar.classList.add('hidden');
+            mainContent.classList.add('expanded');
+        }
+    });
+</script>

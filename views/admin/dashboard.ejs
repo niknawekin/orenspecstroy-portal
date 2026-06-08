@@ -1,4 +1,5 @@
-<%- include('../partials/header') %>
+<%- include('../partials/admin/header') %>
+<%- include('../partials/admin/sidebar') %>
 
 <style>
     .admin-container {
@@ -85,10 +86,15 @@
                 <p>Аварийные</p>
             </div>
         </div>
-        
+        <div class="filter-container" style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <button class="filter-btn active" data-filter="all" style="background: #222; color: #fff; border: 1px solid #333; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Все задачи</button>
+            <button class="filter-btn" data-filter="active" style="background: #111; color: #aaa; border: 1px solid #222; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">В работе</button>
+            <button class="filter-btn" data-filter="emergency" style="background: #111; color: #aaa; border: 1px solid #222; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">🚨 Аварийные</button>
+            <button class="filter-btn" data-filter="completed" style="background: #111; color: #aaa; border: 1px solid #222; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Выполненные</button>
+        </div>
         <table class="admin-table">
             <thead>
-                <tr><th>ID</th><th>Клиент</th><th>Тема</th><th>Срочность</th><th>Статус</th><th>Дата</th><th></th></tr>
+                <tr><th>ID</th><th>Клиент</th><th>Тема</th><th>Срочность</th><th>Статус</th><th>Дата</th><th>Дата выезда</th><th></th></tr>
             </thead>
             <tbody>
                 <% tickets.forEach(ticket => { %>
@@ -98,7 +104,7 @@
                     <td><%= ticket.subject %></td>
                     <td>
                         <span class="<%= ticket.urgency === 'emergency' ? 'urgency-emergency' : (ticket.urgency === 'urgent' ? 'urgency-urgent' : '') %>">
-                            <%= ticket.urgency === 'emergency' ? '🚨 Аварийная' : (ticket.urgency === 'urgent' ? '⚠️ Срочная' : 'Обычная') %>
+                            <%= ticket.urgency === 'emergency' ? 'Аварийная' : (ticket.urgency === 'urgent' ? 'Срочная' : 'Обычная') %>
                         </span>
                     </td>
                     <td>
@@ -107,6 +113,15 @@
                             <option value="В обработке" <%= ticket.status === 'В обработке' ? 'selected' : '' %>>В обработке</option>
                             <option value="Завершено" <%= ticket.status === 'Завершено' ? 'selected' : '' %>>Завершено</option>
                         </select>
+                    </td>
+                    <td>
+                        <% if (ticket.booking_date) { %>
+                            <span class="badge style-date" style="background: rgba(227, 27, 35, 0.1); color: #e31b23; border: 1px solid #e31b23; padding: 5px 10px; border-radius: 4px;">
+                                <%= ticket.booking_date.split('-').reverse().join('.') %>
+                            </span>
+                        <% } else { %>
+                            <span class="text-muted" style="font-size: 0.9rem;">Не указана</span>
+                        <% } %>
                     </td>
                     <td><%= new Date(ticket.created_at).toLocaleDateString() %></td>
                     <td><a href="/admin/tickets/<%= ticket.id %>" class="btn-view">Подробнее</a></td>
@@ -118,18 +133,47 @@
 </main>
 
 <script>
-function updateStatus(ticketId, status) {
-    fetch('/admin/update-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticketId, status })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert('Ошибка');
+    // Фильтрация заявок
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    // Находим все строки таблицы в теле (пропуская заголовок th)
+    const ticketRows = document.querySelectorAll('.admin-table tbody tr');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Обновляем активный класс у кнопок
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter'); // получаем: all, processing, done
+            
+            ticketRows.forEach(row => {
+                // Получаем статус из атрибута строки (приводим к нижнему регистру для надежности)
+                // или проверяем текстовое содержимое ячейки статуса
+                const statusAttr = row.getAttribute('data-status') ? row.getAttribute('data-status').toLowerCase() : '';
+                
+                // Если статус зашит в тексте ячейки (например, "В обработке", "Завершено", "Новая")
+                const statusText = row.querySelector('.status-select') ? row.querySelector('.status-select').value.toLowerCase() : row.textContent.toLowerCase();
+
+                if (filter === 'all') {
+                    // Для строк таблицы вместо 'block' нужно использовать 'table-row' или пустую строку ''
+                    row.style.display = ''; 
+                } else if (filter === 'processing') {
+                    // Проверяем статус (и английский вариант, и русский)
+                    if (statusAttr === 'processing' || statusText.includes('обработк') || statusText.includes('нов')) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } else if (filter === 'done') {
+                    if (statusAttr === 'done' || statusText.includes('заверш') || statusText.includes('выполн')) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
     });
-}
 </script>
 
-<%- include('../partials/footer') %>
+<%- include('../partials/admin/footer') %>

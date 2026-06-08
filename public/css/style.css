@@ -1,5 +1,5 @@
 :root {
-    --primary-red: #E30613;
+    --primary-red: #EF4A20;
     --dark-black: #1A1A1A;
     --light-grey: #F4F4F4;
     --medium-grey: #CCCCCC;
@@ -63,7 +63,7 @@ body, html {
 }
 
 .btn-red:hover {
-    background-color: #b3050f;
+    background-color: #EF4A20;
     transform: translateY(-3px);
 }
 
@@ -121,6 +121,25 @@ body, html {
     transition: 0.4s;
     padding: 20px 0;
 }
+
+#main-header nav ul li a.active {
+    color: var(--primary-red) !important;
+    font-weight: bold;
+    position: relative;
+}
+
+/* Опционально: красивая неоновая полоска под активным пунктом */
+#main-header nav ul li a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-red);
+    box-shadow: 0 0 8px var(--primary-red); /* Легкое свечение в стиле ваших остальных страниц */
+}
+
 
 .header-scrolled {
     background: var(--dark-black);
@@ -1394,6 +1413,195 @@ nav ul li a:hover {
 }
 
 
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #0a0a0a;
+}
+
+.admin-sidebar {
+    width: 260px;
+    background: #111111;
+    border-right: 1px solid #222;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.sidebar-brand {
+    padding: 25px 20px;
+    border-bottom: 1px solid #222;
+    color: #fff;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.sidebar-brand .logo-bold {
+    color: var(--primary-red);
+    font-weight: 900;
+}
+
+.terminal-status {
+    font-size: 0.65rem;
+    color: #444;
+    margin-top: 5px;
+}
+
+.sidebar-menu {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.sidebar-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #a0a0a0;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar-menu li.active a,
+.sidebar-menu a:hover {
+    color: #fff;
+    background: rgba(227, 27, 35, 0.05);
+    border-left: 4px solid var(--primary-red);
+    padding-left: 16px; /* Компенсация бордера */
+}
+
+.sidebar-menu i {
+    width: 25px;
+    font-size: 1.1rem;
+}
+
+.badge-count {
+    background: var(--primary-red);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: auto;
+    font-weight: bold;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #222;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    color: #e31b23;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-logout:hover {
+    color: #ff3333 !important;
+    transform: translateX(3px);
+}
 
 
 
+/* ================= STYLES FOR SPECIALIST TERMINAL ================= */
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #222;
+    margin-top: 15px;
+}
+
+.task-table th {
+    background: #161616;
+    color: #888;
+    text-align: left;
+    padding: 15px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.task-table td {
+    padding: 15px;
+    border-top: 1px solid #222;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+.task-row {
+    transition: background 0.2s ease;
+}
+
+.task-row:hover {
+    background: #151515;
+}
+
+/* Бэйджи срочности */
+.badge {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+}
+.badge.emergency {
+    background: rgba(227, 27, 35, 0.15);
+    color: #ff3333;
+    border: 1px solid rgba(227, 27, 35, 0.3);
+}
+.badge.urgent {
+    background: rgba(255, 153, 0, 0.15);
+    color: #ff9900;
+    border: 1px solid rgba(255, 153, 0, 0.3);
+}
+.badge.normal {
+    background: #222;
+    color: #aaa;
+    border: 1px solid #333;
+}
+
+/* Формы обратной связи инженера */
+.status-form {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.status-form select, 
+.status-form textarea {
+    width: 100%;
+    background: #161616;
+    border: 1px solid #333;
+    padding: 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+.status-form select:focus, 
+.status-form textarea:focus {
+    border-color: #e31b23;
+    outline: none;
+}

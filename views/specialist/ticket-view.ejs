@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка #<%= ticket.id %> | Инженер</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #070707; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .back-link { color: #666; text-decoration: none; display: inline-block; margin-bottom: 20px; transition: 0.3s; }
+        .back-link:hover { color: #e31b23; }
+        .card { background: #111; border: 1px solid #222; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .info-group { margin-bottom: 20px; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px; }
+        .info-label { font-size: 0.8rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .info-value { font-size: 1.1rem; color: #dfdfdf; }
+        
+        .status-form { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 25px; }
+        select, textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; border-radius: 8px; color: white; font-size: 1rem; box-sizing: border-box; margin-bottom: 15px; }
+        select:focus, textarea:focus { border-color: #e31b23; outline: none; }
+        .btn-submit { background: #e31b23; color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: #ff1e27; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="/specialist" class="back-link"><i class="fas fa-arrow-left"></i> Вернуться к графику</a>
+        
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #222; padding-bottom: 15px;">
+                <h1 style="margin:0; font-size: 1.6rem;">Заявка <span style="color:#e31b23;">#<%= ticket.id %></span></h1>
+                <span style="background: rgba(227,27,35,0.1); color: #ff3333; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid rgba(227,27,35,0.2);">
+                    <%= ticket.status %>
+                </span>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Желаемая дата от клиента</div>
+                <div class="info-value">
+                    <% if (ticket.booking_date) { %>
+                        <i class="far fa-calendar-alt" style="color: #e31b23;"></i> 
+                        <%= ticket.booking_date.split('-').reverse().join('.') %>
+                        <% if (ticket.preferred_time) { %>
+                            — <i class="far fa-clock" style="color: #e31b23;"></i> <%= ticket.preferred_time %>
+                        <% } %>
+                    <% } else { %>
+                        <span style="color: #666; font-style: italic;">Клиент не указал конкретную дату при создании</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Утверждено в расписании администратором</div>
+                <div class="info-value" style="font-weight: bold; color: #ff9900;">
+                    <% if (ticket.scheduled_date) { %>
+                        <i class="fas fa-calendar-check"></i> 
+                        <%= ticket.scheduled_date.split('-').reverse().join('.') %> — <%= ticket.time_slot %>
+                    <% } else { %>
+                        <span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Не распределено администрацией в графике</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Что случилось (Тема)</div>
+                <div class="info-value" style="font-weight: bold;"><%= ticket.subject %></div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Адрес проведения работ</div>
+                <div class="info-value"><i class="fas fa-map-marker-alt" style="color:#e31b23;"></i> <%= ticket.address || 'Не указан' %></div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Полное описание неисправности</div>
+                <div class="info-value" style="white-space: pre-wrap; font-size: 1rem; color: #aaa;"><%= ticket.description %></div>
+            </div>
+        </div>
+
+        <div class="status-form">
+            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.1rem;"><i class="fas fa-edit" style="color:#e31b23;"></i> Обновить статус выполнения</h3>
+            
+            <form action="/specialist/tickets/<%= ticket.id %>/status" method="POST">
+                <label style="font-size: 0.8rem; color:#888; display:block; margin-bottom:5px;">Текущий этап работы</label>
+                <select name="status">
+                    <option value="В обработке" <%= ticket.status === 'В обработке' ? 'selected' : '' %>>В обработке (Принята к сведению)</option>
+                    <option value="Выполняется" <%= ticket.status === 'Выполняется' ? 'selected' : '' %>>Выполняется (Выехал / Работаю на объекте)</option>
+                    <option value="Выполнено" <%= ticket.status === 'Выполнено' ? 'selected' : '' %>>Выполнено (Работа завершена)</option>
+                </select>
+
+                <label style="font-size: 0.8rem; color:#888; display:block; margin-bottom:5px;">Отчет инженера (Что сделано, какие материалы использованы)</label>
+                <textarea name="work_report" rows="4" placeholder="Опишите результат осмотра или ремонта..."></textarea>
+                
+                <button type="submit" class="btn-submit">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

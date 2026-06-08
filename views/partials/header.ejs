@@ -19,16 +19,34 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="/">Главная</a></li>
-                    <li><a href="/services">Услуги</a></li>
-                    <li><a href="/kb">База знаний</a></li>
+                    <% if (user && user.role === 'admin') { %>
+                        <li>
+                            <a href="/admin" class="<%= activePage.startsWith('/admin') ? 'active' : '' %>">Панель управления</a>
+                        </li>
+                    <% } %>
+                    
+                    <li>
+                        <a href="/" class="<%= activePage === '/' ? 'active' : '' %>">Главная</a>
+                    </li>
+                    <li>
+                        <a href="/services" class="<%= activePage === '/services' ? 'active' : '' %>">Услуги</a>
+                    </li>
+                    <li>
+                        <a href="/kb" class="<%= activePage.startsWith('/kb') ? 'active' : '' %>">База знаний</a>
+                    </li>
+                    
                     <% if (user) { %>
                         <li><a href="/dashboard">Личный кабинет</a></li>
-                        
-                        <li><a href="/logout" style="color: #e31b23;">Выйти</a></li>
+                        <% if (user.role === 'admin') { %>
+                            <li><a href="/admin" style="color: #EF4A20;"><i class="fas fa-user-shield"></i> Админка</a></li>
+                        <% } %>
+                        <li>
+                            <a href="/logout" style="color: #EF4A20; font-weight: bold;">
+                                <i class="fas fa-sign-out-alt"></i> Выйти
+                            </a>
+                        </li>
                     <% } else { %>
-                        <li><a href="/login">Вход</a></li>
-                        <li><a href="/register">Регистрация</a></li>
+                        <li><a href="/login" class="btn-login-nav">Войти</a></li>
                     <% } %>
                 </ul>
             </nav>

@@ -1,4 +1,5 @@
-<%- include('../partials/header') %>
+<%- include('../partials/admin/header') %>
+<%- include('../partials/admin/sidebar') %>
 
 <style>
     .specialists-page {
@@ -241,9 +242,9 @@
                 <div class="specialist-card">
                     <div class="card-header">
                         <div class="avatar">
-                            <%= spec.fio.charAt(0).toUpperCase() %>
+                            <%= (spec.fio && spec.fio.trim()) ? spec.fio.trim().charAt(0).toUpperCase() : '?' %>
                         </div>
-                        <h3><%= spec.fio %></h3>
+                        <h3><%= spec.fio || 'ФИО не указано' %></h3>
                         <div class="rating">
                             <% for(let i = 0; i < Math.floor(spec.rating); i++) { %>
                                 <i class="fas fa-star"></i>
@@ -287,62 +288,84 @@
 </main>
 
 <!-- Модальное окно добавления -->
-<div class="modal" id="addModal">
-    <div class="modal-content">
-        <h3>Добавить специалиста</h3>
+<div id="addModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000;">
+    <div class="modal-content" style="background: #111; border: 1px solid #333; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; color: white;">
+        <h2 style="margin-bottom: 20px; color: #e31b23;">Регистрация нового специалиста</h2>
+        
         <form action="/admin/specialists/add" method="POST">
-            <div class="form-group">
-                <label>ФИО</label>
-                <input type="text" name="fio" required>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #888;">ФИО Мастера</label>
+                <input type="text" name="fio" required style="width: 100%; padding: 10px; background: #161616; border: 1px solid #333; color: white; border-radius: 8px;">
             </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" required>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #888;">Email (для входа)</label>
+                <input type="email" name="email" required style="width: 100%; padding: 10px; background: #161616; border: 1px solid #333; color: white; border-radius: 8px;">
             </div>
-            <div class="form-group">
-                <label>Телефон</label>
-                <input type="tel" name="phone">
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #888;">Телефон</label>
+                <input type="text" name="phone" placeholder="+7 (999) 123-45-67" required style="width: 100%; padding: 10px; background: #161616; border: 1px solid #333; color: white; border-radius: 8px;">
             </div>
-            <div class="form-group">
-                <label>Специализация</label>
-                <select name="specialization">
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #888;">Пароль учетной записи</label>
+                <input type="password" name="password" required style="width: 100%; padding: 10px; background: #161616; border: 1px solid #333; color: white; border-radius: 8px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #888;">Специализация</label>
+                <select name="specialization" style="width: 100%; padding: 10px; background: #161616; border: 1px solid #333; color: white; border-radius: 8px;">
                     <option value="Универсал">Универсал</option>
                     <option value="Шлагбаумы">Шлагбаумы</option>
                     <option value="Ворота">Автоматические ворота</option>
                     <option value="Электрика">Электрика</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Опыт (лет)</label>
-                <input type="number" name="experience" value="1">
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: #888;">Опыт работы (лет)</label>
+                <input type="number" name="experience" value="1" min="0" style="width: 100%; padding: 10px; background: #161616; border: 1px solid #333; color: white; border-radius: 8px;">
             </div>
+
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button type="button" onclick="closeModal()" class="btn-back">Отмена</button>
-                <button type="submit" class="btn-add">Добавить</button>
+                <button type="button" onclick="closeModal()" style="background: #222; color: white; border: 1px solid #333; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Отмена</button>
+                <button type="submit" style="background: #e31b23; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">Создать и открыть доступ</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
+    // Универсальные функции для управления модальным окном
+    const modal = document.getElementById('addModal');
+
     function openAddModal() {
-        document.getElementById('addModal').classList.add('active');
+        modal.style.display = 'flex';
     }
     
     function closeModal() {
-        document.getElementById('addModal').classList.remove('active');
+        modal.style.display = 'none';
     }
     
+    // Закрытие по клику на фон
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Функция удаления
     function deleteSpecialist(id) {
-        if(confirm('Удалить специалиста?')) {
-            fetch(`/admin/specialists/${id}/delete`, {method: 'POST'})
-                .then(() => location.reload());
+        if(confirm('Вы уверены, что хотите удалить специалиста?')) {
+            fetch(`/admin/specialists/${id}/delete`, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) location.reload();
+                    else alert('Ошибка при удалении');
+                })
+                .catch(err => console.error(err));
         }
     }
-    
-    document.getElementById('addModal').addEventListener('click', (e) => {
-        if(e.target === document.getElementById('addModal')) closeModal();
-    });
 </script>
 
-<%- include('../partials/footer') %>
+<%- include('../partials/admin/footer') %>

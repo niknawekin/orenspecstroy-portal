@@ -1,4 +1,8 @@
-<%- include('../partials/header') %>
+<%- include('../partials/admin/header') %>
+<%- include('../partials/admin/sidebar') %>
+
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
 <style>
     .admin-ticket-container {
@@ -31,6 +35,7 @@
         border: 1px solid #e31b23;
         padding: 8px 16px;
         border-radius: 8px;
+        outline: none;
     }
     .info-row {
         display: flex;
@@ -67,6 +72,16 @@
     .urgency-urgent {
         color: #ffc107;
     }
+    /* Стилизация календаря под темную тему */
+    .fc {
+        color: #fff;
+        background: #111;
+        border-radius: 8px;
+        padding: 10px;
+    }
+    .fc th { color: #888; }
+    .fc-theme-standard td, .fc-theme-standard th { border-color: #2a2a2a !important; }
+    .fc-timegrid-slot { height: 40px !important; }
 </style>
 
 <main>
@@ -80,6 +95,9 @@
                     <option value="Новая" <%= ticket.status === 'Новая' ? 'selected' : '' %>>Новая</option>
                     <option value="В обработке" <%= ticket.status === 'В обработке' ? 'selected' : '' %>>В обработке</option>
                     <option value="Завершено" <%= ticket.status === 'Завершено' ? 'selected' : '' %>>Завершено</option>
+                    <% if (user && user.role === 'admin') { %>
+                        <option value="Архив" <%= ticket.status === 'Архив' ? 'selected' : '' %>>Архив (Отмена)</option>
+                    <% } %>
                 </select>
             </div>
             
@@ -102,7 +120,7 @@
                 <div class="info-label">Тема:</div>
                 <div class="info-value"><%= ticket.subject %></div>
             </div>
-            
+  
             <div class="info-row">
                 <div class="info-label">Описание:</div>
                 <div class="info-value"><%= ticket.description %></div>
@@ -131,16 +149,51 @@
                 <div class="info-label">Адрес:</div>
                 <div class="info-value"><%= ticket.address || 'Не указан' %></div>
             </div>
-            
+
+            <div class="info-row" style="border-left: 3px solid #e31b23; padding-left: 10px; margin: 15px 0;">
+                <div class="info-label" style="color: #e31b23; font-weight: bold;">Желаемая дата выезда:</div>
+                <div class="info-value" style="font-weight: bold;">
+                    <% if (ticket.booking_date) { %>
+                        <i class="far fa-calendar-alt"></i> <%= ticket.booking_date.split('-').reverse().join('.') %>
+                    <% } else { %>
+                        <span class="text-muted">Не указана</span>
+                    <% } %>
+                </div>
+            </div>
+
             <div class="info-row">
                 <div class="info-label">Дата создания:</div>
                 <div class="info-value"><%= new Date(ticket.created_at).toLocaleString('ru-RU') %></div>
+            </div>
+        </div>
+
+        <div class="ticket-card">
+            <h3 style="margin-bottom: 20px; color: white;">🗓 Назначение мастера и времени выезда</h3>
+            
+            <div class="info-row" style="background: transparent; padding: 0; align-items: center; gap: 15px;">
+                <label for="specialistSelect" style="color: #888;">Выберите специалиста:</label>
+                <select id="specialistSelect" class="status-select" style="min-width: 250px;">
+                    <option value="">-- Не назначен --</option>
+                    <% if (locals.specialists) { %>
+                        <% specialists.forEach(function(sp) { %>
+                            <option value="<%= sp.id %>"><%= sp.fio %> (<%= sp.specialization %>)</option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+
+            <div id="calendar-section" style="display: none; margin-top: 25px;">
+                <p style="color: #888; font-size: 0.9rem; margin-bottom: 15px;">
+                    💡 Кликните на пустую ячейку времени (рабочие часы с 09:00 до 18:00), чтобы забронировать выезд мастера на эту заявку. Предыдущие брони выделены красным.
+                </p>
+                <div id='calendar'></div>
             </div>
         </div>
     </div>
 </main>
 
 <script>
+// Быстрое обновление статуса заявки
 function updateStatus(ticketId, status) {
     fetch('/admin/update-status', {
         method: 'POST',
@@ -156,6 +209,105 @@ function updateStatus(ticketId, status) {
         }
     });
 }
+
+// Инициализация логики календаря
+document.addEventListener('DOMContentLoaded', function() {
+    const specialistSelect = document.getElementById('specialistSelect');
+    const calendarSection = document.getElementById('calendar-section');
+    let calendar = null;
+
+    specialistSelect.addEventListener('change', function() {
+        const specialistId = this.value;
+
+        if (!specialistId) {
+            calendarSection.style.display = 'none';
+            return;
+        }
+
+        // Показываем блок с календарем
+        calendarSection.style.display = 'block';
+
+        if (!calendar) {
+            var calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                locale: 'ru', // Полная русификация интерфейса
+                firstDay: 1,  // Начинать неделю с понедельника
+                slotMinTime: '09:00:00', // Ограничиваем рабочий день СПТС-ОСС
+                slotMaxTime: '19:00:00',
+                allDaySlot: false,
+                selectable: true,
+                height: 'auto',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'timeGridWeek,timeGridDay'
+                },
+                // Загружаем занятые ивенты динамически по ID мастера
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    const currentId = document.getElementById('specialistSelect').value;
+                    fetch(`/api/admin/specialist-events?specialist_id=${currentId}`)
+                        .then(res => res.json())
+                        .then(data => successCallback(data))
+                        .catch(err => {
+                            console.error(err);
+                            failureCallback(err);
+                        });
+                },
+                // Обработка клика по свободному временному слоту
+                select: function(info) {
+                    const startDate = new Date(info.startStr);
+                    
+                    // Защита от выбора прошедшего времени
+                    if (startDate < new Date()) {
+                        alert('Невозможно назначить мастера на прошедшее время!');
+                        calendar.unselect();
+                        return;
+                    }
+
+                    // Форматируем дату для SQLite (YYYY-MM-DD) и время (HH:MM)
+                    const dateStr = startDate.toISOString().split('T')[0];
+                    const timeStr = startDate.toTimeString().split(' ')[0].substring(0, 5);
+
+                    const confirmAssignment = confirm(`Назначить мастера на ${dateStr} к ${timeStr} часам?`);
+                    
+                    if (confirmAssignment) {
+                        fetch('/admin/tickets/assign-schedule', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ticket_id: '<%= ticket.id %>',
+                                specialist_id: specialistSelect.value,
+                                date: dateStr,
+                                time_slot: timeStr
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Мастер успешно назначен на заявку. Статус изменен на "В обработке"');
+                                location.reload();
+                            } else {
+                                alert('Ошибка при бронировании: ' + data.error);
+                                calendar.unselect();
+                            }
+                        })
+                        .catch(err => {
+                            alert('Ошибка отправки данных на сервер.');
+                            calendar.unselect();
+                        });
+                    } else {
+                        calendar.unselect();
+                    }
+                }
+            });
+            calendar.render();
+        } else {
+            // Если календарь уже существует, просто принудительно обновляем события для нового мастера
+            calendar.refetchEvents();
+        }
+    });
+});
 </script>
 
-<%- include('../partials/footer') %>
+<%- include('../partials/admin/footer') %>

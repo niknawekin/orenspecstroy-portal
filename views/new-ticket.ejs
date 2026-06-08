@@ -1,4 +1,6 @@
 <%- include('partials/header') %>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 
 <style>
     /* Hero секция */
@@ -403,14 +405,14 @@
                                 <label>Тип оборудования <span class="required">*</span></label>
                                 <select name="equipment_type" required>
                                     <option value="">Выберите тип</option>
-                                    <option value="Шлагбаум">🚧 Шлагбаум</option>
-                                    <option value="Роллетные ворота">📦 Роллетные ворота</option>
-                                    <option value="Откатные ворота">🚪 Откатные ворота</option>
-                                    <option value="Распашные ворота">🚪 Распашные ворота</option>
-                                    <option value="Промышленные ворота">🏭 Промышленные ворота</option>
-                                    <option value="Привод Alutech">⚙️ Привод Alutech</option>
-                                    <option value="Привод Nice">⚙️ Привод Nice</option>
-                                    <option value="Другое">📌 Другое</option>
+                                    <option value="Шлагбаум">Шлагбаум</option>
+                                    <option value="Роллетные ворота">Роллетные ворота</option>
+                                    <option value="Откатные ворота">Откатные ворота</option>
+                                    <option value="Распашные ворота">Распашные ворота</option>
+                                    <option value="Промышленные ворота">Промышленные ворота</option>
+                                    <option value="Привод Alutech">Привод Alutech</option>
+                                    <option value="Привод Nice">Привод Nice</option>
+                                    <option value="Другое">Другое</option>
                                 </select>
                             </div>
                             
@@ -470,10 +472,15 @@
                             <label>Удобное время для визита</label>
                             <select name="preferred_time">
                                 <option value="">Не важно</option>
-                                <option value="morning">🌅 09:00 - 12:00</option>
-                                <option value="day">☀️ 12:00 - 15:00</option>
-                                <option value="afternoon">🌇 15:00 - 18:00</option>
+                                <option value="morning">09:00 - 12:00</option>
+                                <option value="day">12:00 - 15:00</option>
+                                <option value="afternoon">15:00 - 18:00</option>
                             </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="booking_date" class="form-label">Желаемая дата выезда мастера:</label>
+                            <input type="text" id="booking_date" name="booking_date" class="form-control" placeholder="Выберите дату..." required readonly>
+                            <div class="form-text">Серые даты уже забронированы другими клиентами.</div>
                         </div>
                         
                         <div class="form-group">
@@ -639,6 +646,33 @@
             }
         });
     }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // 1. Делаем запрос к нашему API, чтобы получить занятые даты
+        const response = await fetch('/api/booked-dates');
+        const bookedDates = await response.json(); // Массив строк типа ['2026-06-12', '2026-06-15']
+
+        // 2. Инициализируем календарь Flatpickr на инпуте
+        flatpickr("#booking_date", {
+            locale: "ru",          // Русский язык
+            dateFormat: "Y-m-d",   // Формат, который уйдет в базу SQLite (ГГГГ-ММ-ДД)
+            altInput: true,        
+            altFormat: "d.m.Y",    // Формат, который будет видеть пользователь (ДД.ММ.ГГГГ)
+            minDate: "today",      // Нельзя выбрать прошедшие дни
+            disable: bookedDates,  // Передаем массив занятых дат с сервера
+            firstDayOfWeek: 1      // Начинать неделю с понедельника
+        });
+    } catch (error) {
+        console.error('Не удалось загрузить забронированные даты:', error);
+        // Калбэк на случай сбоя сети: просто инициализируем пустой календарь от сегодняшнего дня
+        flatpickr("#booking_date", { locale: "ru", dateFormat: "Y-m-d", minDate: "today" });
+    }
+});
 </script>
 
 <%- include('partials/footer') %>

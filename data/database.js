@@ -129,7 +129,7 @@ async function initDB() {
     }
 
     // Миграция для существующей БД (добавляем колонки, если их нет)
-    const columns = ['equipment_type', 'model', 'urgency', 'preferred_time', 'address', 'phone'];
+    const columns = ['equipment_type', 'model', 'urgency', 'preferred_time', 'address', 'phone', 'booking_date'];
     for (const col of columns) {
         try {
             await db.exec(`ALTER TABLE tickets ADD COLUMN ${col} TEXT`);

@@ -1,4 +1,5 @@
-<%- include('../partials/header') %>
+<%- include('../partials/admin/header') %>
+<%- include('../partials/admin/sidebar') %>
 
 <style>
     .calendar-page {
@@ -6,272 +7,296 @@
         padding-bottom: 60px;
         background: #0a0a0a;
         min-height: 100vh;
+        color: white;
     }
-    
+    .calendar-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+    @media (max-width: 968px) {
+        .calendar-layout { grid-template-columns: 1fr; }
+    }
+    /* Стили самого календаря */
+    .calendar-wrapper {
+        background: #111;
+        border: 1px solid #222;
+        border-radius: 16px;
+        padding: 25px;
+    }
     .calendar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-        gap: 20px;
+        margin-bottom: 20px;
     }
-    
-    .date-nav {
-        display: flex;
-        gap: 15px;
-        align-items: center;
+    .calendar-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-transform: capitalize;
     }
-    
-    .date-nav button {
-        background: #1a1a1a;
+    .calendar-btn {
+        background: #222;
         border: 1px solid #333;
-        padding: 10px 20px;
-        border-radius: 10px;
         color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
         cursor: pointer;
+        transition: 0.3s;
     }
+    .calendar-btn:hover { border-color: #e31b23; background: #1a1a1a; }
     
-    .calendar-grid {
-        background: #1a1a1a;
-        border-radius: 20px;
-        overflow: hidden;
-    }
-    
-    .calendar-weekdays {
+    .weekdays-grid {
         display: grid;
-        grid-template-columns: 100px repeat(7, 1fr);
-        background: #e31b23;
-    }
-    
-    .calendar-weekdays div {
-        padding: 15px;
+        grid-template-columns: repeat(7, 1fr);
         text-align: center;
-        font-weight: 600;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
     }
+    .days-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+    }
+    .calendar-day {
+        background: #161616;
+        aspect-ratio: 1.2;
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid #222;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .calendar-day:hover { border-color: #444; background: #1c1c1c; }
+    .calendar-day.empty { background: transparent; border: none; cursor: default; }
+    .calendar-day.today { border-color: #e31b23; background: rgba(227, 27, 35, 0.05); }
+    .calendar-day.selected { background: #e31b23 !important; border-color: #e31b23; }
+    .calendar-day.selected .day-number, .calendar-day.selected .dots-container i { color: white !important; }
     
-    .calendar-rows {
+    .day-number { font-weight: bold; color: #aaa; font-size: 1rem; }
+    .dots-container { display: flex; gap: 4px; justify-content: center; min-height: 12px; }
+    .task-dot { width: 6px; height: 6px; background: #e31b23; border-radius: 50%; }
+    .task-dot.emergency { background: #ff3333; box-shadow: 0 0 8px #ff3333; }
+
+    /* Правая панель с подробностями дня */
+    .details-wrapper {
+        background: #111;
+        border: 1px solid #222;
+        border-radius: 16px;
+        padding: 25px;
         display: flex;
         flex-direction: column;
     }
-    
-    .calendar-row {
-        display: grid;
-        grid-template-columns: 100px repeat(7, 1fr);
-        border-bottom: 1px solid #333;
+    .details-title { font-size: 1.2rem; border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 20px; }
+    .task-list { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; max-height: 500px; }
+    .task-card {
+        background: #161616;
+        border: 1px solid #222;
+        border-radius: 10px;
+        padding: 15px;
+        border-left: 4px solid #888;
     }
-    
-    .time-cell {
-        background: #0f0f0f;
-        padding: 10px;
-        text-align: center;
-        font-weight: 600;
-        color: #e31b23;
-        border-right: 1px solid #333;
-    }
-    
-    .slot-cell {
-        padding: 8px;
-        border-right: 1px solid #333;
-        min-height: 70px;
-    }
-    
-    .slot-booked {
-        background: rgba(227, 27, 35, 0.2);
-        border-left: 3px solid #e31b23;
-        padding: 8px;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-    
-    .slot-free {
-        background: rgba(40, 167, 69, 0.1);
-        border: 1px dashed #28a745;
-        padding: 8px;
-        border-radius: 8px;
-        cursor: pointer;
-        text-align: center;
-        color: #28a745;
-    }
-    
-    .slot-free:hover {
-        background: rgba(40, 167, 69, 0.2);
-    }
-    
-    .booking-info {
-        font-size: 0.75rem;
-    }
-    
-    .booking-info strong {
-        display: block;
-        margin-bottom: 4px;
-    }
-    
-    .btn-cancel {
-        background: none;
-        border: none;
-        color: #e31b23;
-        cursor: pointer;
-        font-size: 0.7rem;
-        margin-top: 5px;
-    }
-    
-    @media (max-width: 768px) {
-        .calendar-grid {
-            overflow-x: auto;
-        }
-        .calendar-weekdays, .calendar-row {
-            min-width: 800px;
-        }
-    }
+    .task-card.emergency { border-left-color: #ff3333; }
+    .task-card.urgent { border-left-color: #ff9900; }
+    .task-card h4 { margin: 0 0 5px 0; color: #fff; font-size: 0.95rem; }
+    .task-meta { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
+    .task-spec { font-size: 0.85rem; color: #aaa; display: flex; align-items: center; gap: 6px; }
+    .task-spec i { color: #e31b23; font-size: 0.8rem; }
+    .no-tasks { color: #555; text-align: center; padding: 40px 0; font-size: 0.9rem; }
 </style>
 
 <main class="calendar-page">
-    <div class="container">
-        <div class="calendar-header">
-            <div>
-                <h1><i class="fas fa-calendar-alt"></i> Календарь специалиста</h1>
-                <p style="color: #888;"><%= specialist.fio %> - <%= specialist.specialization || 'Специалист' %></p>
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 0 30px;">
+        
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #fff, #e31b23); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <i class="fas fa-calendar-alt" style="color: #e31b23; margin-right: 10px;"></i> Расписание выездов специалистов
+            </h1>
+            <p style="color: #666; margin-top: 5px;">Мониторинг графиков работ и назначенных инженеров</p>
+        </div>
+
+        <div class="calendar-layout">
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button class="calendar-btn" id="prevMonthBtn"><i class="fas fa-chevron-left"></i> Изменить</button>
+                    <h2 id="monthTitle">Месяц Год</h2>
+                    <button class="calendar-btn" id="nextMonthBtn">След. <i class="fas fa-chevron-right"></i></button>
+                </div>
+                
+                <div class="weekdays-grid">
+                    <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+                </div>
+                
+                <div class="days-grid" id="calendarDaysGrid">
+                    </div>
             </div>
-            <div class="date-nav">
-                <button onclick="changeWeek(-1)"><i class="fas fa-chevron-left"></i></button>
-                <span id="currentWeek" style="font-weight: 600;"></span>
-                <button onclick="changeWeek(1)"><i class="fas fa-chevron-right"></i></button>
-                <a href="/admin/specialists" class="btn-back" style="background: #333; padding: 10px 20px; border-radius: 10px; text-decoration: none; color: white;">← Назад</a>
+
+            <div class="details-wrapper">
+                <div class="details-title">
+                    <i class="fas fa-clock" style="color: #e31b23; margin-right: 8px;"></i>
+                    <span id="selectedDateTitle">Выберите день</span>
+                </div>
+                <div class="task-list" id="dayTaskList">
+                    <div class="no-tasks">Выберите любой день на календаре для просмотра расписания мастеров.</div>
+                </div>
             </div>
         </div>
         
-        <div class="calendar-grid" id="calendarGrid">
-            <!-- Календарь будет отрисован через JS -->
-        </div>
     </div>
 </main>
 
 <script>
+    // Парсим массив задач, переданный из Node.js
+    const allTasks = <%- tasksJson %>;
+    
     let currentDate = new Date();
-    const specialistId = <%= specialist.id %>;
-    const timeSlots = <%= JSON.stringify(timeSlots) %>;
-    let schedule = <%= JSON.stringify(schedule) %>;
-    
-    function getWeekDates(date) {
-        const start = new Date(date);
-        const day = start.getDay();
-        const diff = start.getDate() - day + (day === 0 ? -6 : 1);
-        const weekDates = [];
-        
-        for(let i = 0; i < 7; i++) {
-            const d = new Date(start);
-            d.setDate(diff + i);
-            weekDates.push(d);
-        }
-        return weekDates;
-    }
-    
-    function formatDate(date) {
-        return date.toISOString().split('T')[0];
-    }
-    
-    function isSlotBooked(date, timeSlot) {
-        return schedule.find(s => s.date === date && s.time_slot === timeSlot && s.is_booked === 1);
-    }
-    
+    let selectedDateStr = null;
+
+    const monthTitle = document.getElementById('monthTitle');
+    const daysGrid = document.getElementById('calendarDaysGrid');
+    const selectedDateTitle = document.getElementById('selectedDateTitle');
+    const dayTaskList = document.getElementById('dayTaskList');
+
     function renderCalendar() {
-        const weekDates = getWeekDates(currentDate);
-        const weekStart = weekDates[0];
-        const weekEnd = weekDates[6];
+        daysGrid.innerHTML = '';
         
-        document.getElementById('currentWeek').innerText = 
-            `${weekStart.toLocaleDateString('ru-RU')} - ${weekEnd.toLocaleDateString('ru-RU')}`;
-        
-        let html = `
-            <div class="calendar-weekdays">
-                <div>Время</div>
-        `;
-        
-        weekDates.forEach(date => {
-            const isToday = formatDate(date) === formatDate(new Date());
-            html += `<div style="${isToday ? 'background: rgba(227,27,35,0.3);' : ''}">
-                ${date.toLocaleDateString('ru-RU', {weekday: 'short'})}<br>
-                <strong>${date.getDate()}</strong>
-            </div>`;
-        });
-        html += `</div><div class="calendar-rows">`;
-        
-        timeSlots.forEach(slot => {
-            html += `<div class="calendar-row">
-                <div class="time-cell">${slot.slot_time}</div>`;
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // Локализация заголовка месяца
+        monthTitle.innerText = currentDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+        // Первый день месяца и количество дней
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        // Корректируем индекс под русский календарь (где Пн - 0, а Вс - 6)
+        const adjustedFirstDay = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        // 1. Отрендерить пустые карточки до первого дня месяца
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.classList.add('calendar-day', 'empty');
+            daysGrid.appendChild(emptyDiv);
+        }
+
+        // 2. Рендерим дни месяца
+        const today = new Date();
+        for (let day = 1; day <= totalDays; day++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('calendar-day');
             
-            weekDates.forEach(date => {
-                const dateStr = formatDate(date);
-                const booked = isSlotBooked(dateStr, slot.slot_time);
-                
-                if(booked) {
-                    html += `<div class="slot-cell">
-                        <div class="slot-booked" onclick="viewBooking(${booked.id})">
-                            <div class="booking-info">
-                                <strong>${booked.client_fio || 'Клиент'}</strong>
-                                <small>${booked.ticket_subject || 'Заявка'}</small>
-                                <button class="btn-cancel" onclick="event.stopPropagation(); cancelBooking(${booked.id})">✖ Отменить</button>
-                            </div>
-                        </div>
-                    </div>`;
-                } else {
-                    html += `<div class="slot-cell">
-                        <div class="slot-free" onclick="addBooking('${dateStr}', '${slot.slot_time}')">
-                            <i class="fas fa-plus"></i> Свободно
-                        </div>
-                    </div>`;
-                }
-            });
-            html += `</div>`;
-        });
-        
-        html += `</div>`;
-        document.getElementById('calendarGrid').innerHTML = html;
-    }
-    
-    function changeWeek(delta) {
-        currentDate.setDate(currentDate.getDate() + delta * 7);
-        renderCalendar();
-    }
-    
-    function addBooking(date, timeSlot) {
-        const ticketId = prompt('Введите ID заявки для бронирования:');
-        if(ticketId) {
-            fetch('/admin/schedule/add', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    specialist_id: specialistId,
-                    date: date,
-                    time_slot: timeSlot,
-                    ticket_id: ticketId
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) location.reload();
-                else alert('Ошибка: ' + data.error);
-            });
-        }
-    }
-    
-    function cancelBooking(scheduleId) {
-        if(confirm('Отменить бронирование?')) {
-            fetch(`/admin/schedule/${scheduleId}/cancel`, {method: 'POST'})
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) location.reload();
-                    else alert('Ошибка');
+            // Форматируем текущую дату ячейки в строку YYYY-MM-DD
+            const currentMonthStr = String(month + 1).padStart(2, '0');
+            const currentDayStr = String(day).padStart(2, '0');
+            const dateString = `${year}-${currentMonthStr}-${currentDayStr}`;
+            
+            dayDiv.setAttribute('data-date', dateString);
+
+            // Проверяем, текущий ли это день
+            if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                dayDiv.classList.add('today');
+            }
+            
+            // Если этот день был выделен пользователем ранее
+            if (dateString === selectedDateStr) {
+                dayDiv.classList.add('selected');
+            }
+
+            // Номер дня
+            const numSpan = document.createElement('span');
+            numSpan.classList.add('day-number');
+            numSpan.innerText = day;
+            dayDiv.appendChild(numSpan);
+
+            // Ищем задачи на этот день, чтобы поставить индикаторы (точки)
+            const dayTasks = allTasks.filter(t => t.scheduled_date === dateString);
+            const dotsContainer = document.createElement('div');
+            dotsContainer.classList.add('dots-container');
+
+            if (dayTasks.length > 0) {
+                // Добавляем до 3 точек, чтобы сетка не ломалась
+                dayTasks.slice(0, 3).forEach(task => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('task-dot');
+                    if (task.urgency === 'emergency') dot.classList.add('emergency');
+                    dotsContainer.appendChild(dot);
                 });
+            }
+            dayDiv.appendChild(dotsContainer);
+
+            // Клик по дню подгружает список задач справа
+            dayDiv.addEventListener('click', () => {
+                document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
+                dayDiv.classList.add('selected');
+                selectedDateStr = dateString;
+                showTasksForDate(dateString, dayTasks);
+            });
+
+            daysGrid.appendChild(dayDiv);
         }
     }
-    
-    function viewBooking(scheduleId) {
-        window.location.href = `/admin/tickets/${scheduleId}`;
+
+    function showTasksForDate(dateStr, dayTasks) {
+        // Красивый формат даты для заголовка
+        const formattedDate = new Date(dateStr).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        selectedDateTitle.innerText = formattedDate;
+
+        dayTaskList.innerHTML = '';
+
+        if (dayTasks.length === 0) {
+            dayTaskList.innerHTML = '<div class="no-tasks">На этот день выездов не запланировано.</div>';
+            return;
+        }
+
+        dayTasks.forEach(task => {
+            const card = document.createElement('div');
+            card.classList.add('task-card');
+            if (task.urgency === 'emergency') card.classList.add('emergency');
+            if (task.urgency === 'urgent') card.classList.add('urgent');
+
+            card.innerHTML = `
+                <h4>Заявка #${task.id}: ${task.title}</h4>
+                <div class="task-meta">
+                    <i class="fas fa-map-marker-alt"></i> ${task.address || 'Адрес не указан'} <br>
+                    <i class="fas fa-info-circle"></i> Статус: <strong>${task.status}</strong>
+                </div>
+                <div class="task-spec">
+                    <i class="fas fa-user-hard-hat"></i>
+                    <span>Мастер: <strong>${task.specialist_name || 'Не назначен'}</strong></span>
+                </div>
+                <a href="/admin/tickets/${task.id}" style="display:inline-block; margin-top:10px; font-size:0.8rem; color:#e31b23; text-decoration:none; font-weight:bold;">Перейти к заявке &rarr;</a>
+            `;
+            dayTaskList.appendChild(card);
+        });
     }
-    
+
+    // Кнопки управления месяцами
+    document.getElementById('prevMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    document.getElementById('nextMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    // Стартовый рендеринг при загрузке страницы
     renderCalendar();
+    
+    // Автоматически выбираем текущий день при старте
+    const todayStr = currentDate.toISOString().split('T')[0];
+    const todayCell = document.querySelector(`[data-date="${todayStr}"]`);
+    if (todayCell) {
+        todayCell.click();
+    }
 </script>
 
-<%- include('../partials/footer') %>
+<%- include('../partials/admin/footer') %>

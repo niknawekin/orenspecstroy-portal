@@ -1,0 +1,90 @@
+<%- include('../partials/admin/header') %>
+<%- include('../partials/admin/sidebar') %>
+
+<main class="admin-container" style="padding-top: 100px; padding-bottom: 60px; background: #0a0a0a; min-height: 100vh; color: white;">
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 0 30px;">
+        
+        <div style="margin-bottom: 30px;">
+            <a href="/admin" style="color: #e31b23; text-decoration: none;"><i class="fas fa-arrow-left"></i> Назад в панель управления</a>
+            <h1 style="margin-top: 15px; font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #fff, #e31b23); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <i class="fas fa-ticket-alt" style="color: #e31b23; margin-right: 10px;"></i> Все заявки техподдержки
+            </h1>
+        </div>
+
+        <table class="admin-table" style="width: 100%; border-collapse: collapse; background: #111; border: 1px solid #222;">
+            <thead>
+                <tr style="background: #1a1a1a; color: #888; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                    <th style="padding: 18px; text-align: left;">ID</th>
+                    <th style="padding: 18px; text-align: left;">Клиент</th>
+                    <th style="padding: 18px; text-align: left;">Тема / Оборудование</th>
+                    <th style="padding: 18px; text-align: left;">Срочность</th>
+                    <th style="padding: 18px; text-align: left;">Статус</th>
+                    <th style="padding: 18px; text-align: left;">Дата создания</th>
+                    <th style="padding: 18px; text-align: left;">Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% tickets.forEach(ticket => { %>
+                <tr class="<%= ticket.urgency === 'emergency' ? 'row-urgent' : '' %>" style="border-bottom: 1px solid #222; transition: 0.3s;">
+                    <td style="padding: 18px; font-weight: bold; color: #e31b23;">#<%= ticket.id %></td>
+                    <td style="padding: 18px;">
+                        <%= ticket.client_fio || 'Удалённый пользователь' %><br>
+                        <small style="color: #666;"><%= ticket.phone || '' %></small>
+                    </td>
+                    <td style="padding: 18px;">
+                        <span style="font-weight: 600;"><%= ticket.subject %></span><br>
+                        <small style="color: #888;"><%= ticket.equipment_type || '—' %> (<%= ticket.model || 'не указана' %>)</small>
+                    </td>
+                    <td style="padding: 18px;">
+                        <% if (ticket.urgency === 'emergency') { %>
+                            <span style="color: #EF4A20; font-weight: 900; text-transform: uppercase; font-size: 0.7rem;">🚨 АВАРИЙНАЯ</span>
+                        <% } else if (ticket.urgency === 'urgent') { %>
+                            <span style="color: #ff9800; font-weight: 900; text-transform: uppercase; font-size: 0.7rem;">⚠️ Срочная</span>
+                        <% } else { %>
+                            <span style="color: #555; font-weight: 900; text-transform: uppercase; font-size: 0.7rem;">Обычная</span>
+                        <% } %>
+                    </td>
+                    <td style="padding: 18px;">
+                        <select onchange="updateStatus(<%= ticket.id %>, this.value)" style="background: #222; color: white; border: 1px solid #e31b23; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+                            <option value="new" <%= ticket.status === 'new' || ticket.status === 'Новая' ? 'selected' : '' %>>Новая</option>
+                            <option value="processing" <%= ticket.status === 'processing' || ticket.status === 'В обработке' ? 'selected' : '' %>>В обработке</option>
+                            <option value="Завершено" <%= ticket.status === 'Завершено' ? 'selected' : '' %>>Завершено</option>
+                        </select>
+                    </td>
+                    <td style="padding: 18px; color: #aaa;"><%= new Date(ticket.created_at).toLocaleDateString('ru-RU') %></td>
+                    <td style="padding: 18px;">
+                        <a href="/admin/tickets/<%= ticket.id %>" style="background: #222; color: white; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; transition: 0.3s;" onmouseover="this.style.borderColor='#e31b23'" onmouseout="this.style.borderColor='#333'">Подробнее</a>
+                    </td>
+                </tr>
+                <% }) %>
+                <% if (tickets.length === 0) { %>
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #666;">Заявок пока нет.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+function updateStatus(ticketId, status) {
+    fetch('/admin/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticketId, status })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert('Не удалось обновить статус: ' + (data.error || 'Неизвестная ошибка'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Ошибка сети при обновлении статуса');
+    });
+}
+</script>
+
+<%- include('../partials/admin/footer') %>

@@ -1,0 +1,38 @@
+<footer style="margin-top: auto; padding: 20px 40px; border-top: 1px solid #111; font-size: 0.8rem; color: #444; display: flex; justify-content: space-between;">
+            <div>&copy; 2026 Холдинг «Оренспецстрой». Панель управления.</div>
+            <div>Версия системы 1.0.0</div>
+        </footer>
+    </div> </div> 
+    <script src="/js/main.js"></script>
+
+    <script>
+        const sidebar = document.querySelector('.admin-sidebar');
+        const mainContent = document.querySelector('.admin-main-content');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const trigger = document.getElementById('sidebarTrigger');
+
+        // Функция переключения
+        function toggleSidebar() {
+            sidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('expanded');
+            
+            // Сохраняем состояние (чтобы меню не открывалось само при перезагрузке)
+            const isHidden = sidebar.classList.contains('hidden');
+            localStorage.setItem('sidebarHidden', isHidden);
+        }
+
+        // Слушатели событий
+        toggleBtn.addEventListener('click', toggleSidebar);
+        trigger.addEventListener('click', toggleSidebar);
+
+        // Восстановление состояния при загрузке страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('sidebarHidden') === 'true') {
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('expanded');
+            }
+        });
+    </script>
+
+</body>
+</html>
